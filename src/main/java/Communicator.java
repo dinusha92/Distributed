@@ -1,21 +1,21 @@
 public class Communicator {
-	private String host;
+	private String ip;
 	private int port;
 	private String message;
 
-	public Communicator(String host, int port, String message) {
+	public Communicator(String ip, int port, String message) {
 		super();
-		this.host = host;
+		this.ip = ip;
 		this.port = port;
 		this.message = message;
 	}
 
-	public String getHost() {
-		return host;
+	public String getIp() {
+		return ip;
 	}
 
-	public void setHost(String host) {
-		this.host = host;
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 
 	public int getPort() {
@@ -36,6 +36,6 @@ public class Communicator {
 
 	@Override
 	public String toString() {
-		return host + ":" + port + " - " + message;
+		return ip + ":" + port + " - " + message;
 	}
 }

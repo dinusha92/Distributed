@@ -3,14 +3,14 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 public class Node {
 
 
-    private Neighbour node_a;
-    private Neighbour node_b;
-
+    private Neighbour predecessor, successor;
+    private ArrayList<Neighbour> finger = new ArrayList<>();
     public static DatagramSocket socket;
 
     static DecimalFormat formatter = new DecimalFormat("0000");
@@ -28,15 +28,13 @@ public class Node {
 
     }
 
-    public static void joinNode(Neighbour nodeA, Neighbour nodeB){
 
-    }
 
     public static void send(Communicator request) {
         System.out.println(request);
         try {
             DatagramPacket packet = new DatagramPacket(request.getMessage().getBytes(), request.getMessage().getBytes().length,
-                    InetAddress.getByName(request.getHost()), request.getPort());
+                    InetAddress.getByName(request.getIp()), request.getPort());
             socket.send(packet);
         } catch (IOException e) {
             System.out.println( e);
@@ -125,6 +123,38 @@ public class Node {
         } else if (Command.ERROR.equals(command)) {
         } else {
         }
+    }
+
+    private void createChordRing(){
+
+    }
+
+    private static void joinNode(Neighbour node){
+
+    }
+
+    private  static void stabilize(){
+
+    }
+
+    private static void notifyNodes(){
+
+    }
+
+    private static  void fix_fingers(){
+
+    }
+
+    private static void check_predecessor(){
+
+    }
+
+    private static void find_successor (){
+
+    }
+
+    private static void closest_preceding_node(){
+
     }
 
 }
