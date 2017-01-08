@@ -61,7 +61,7 @@ public class Node {
                 String message = new String(data, 0, packet.getLength());
 
                 Communicator response = new Communicator(packet.getAddress().getHostAddress(), packet.getPort(), message);
-                onResponseRecieved(response);
+                onResponseReceived(response);
 
 
                 System.out.println("dfdfdfsdfsd");
@@ -75,7 +75,7 @@ public class Node {
         }
     }
 
-    public static void onResponseRecieved(Communicator response) {
+    public static void onResponseReceived(Communicator response) {
 
     }
 }
