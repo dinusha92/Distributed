@@ -53,21 +53,29 @@ public class Node {
                 done = false;
             }
             byte[] buffer = new byte[65536];
-            DatagramPacket incoming = new DatagramPacket(buffer, buffer.length);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             try{
-                socket.receive(incoming);
+                socket.receive(packet);
+
+                byte[] data = packet.getData();
+                String message = new String(data, 0, packet.getLength());
+
+                Communicator response = new Communicator(packet.getAddress().getHostAddress(), packet.getPort(), message);
+                onResponseRecieved(response);
+
+
                 System.out.println("dfdfdfsdfsd");
             }catch (IOException e){
                 System.out.println("ddaee");
             }
 
-            byte[] data = incoming.getData();
-            String s = new String(data, 0, incoming.getLength());
-            System.out.println(s);
+//            byte[] data = packet.getData();
+//            String s = new String(data, 0, packet.getLength());
+//            System.out.println(s);
         }
     }
 
-    public static void Request() {
+    public static void onResponseRecieved(Communicator response) {
 
     }
 }
