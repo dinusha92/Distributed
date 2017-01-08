@@ -2,10 +2,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.text.DecimalFormat;
-import java.util.List;
-import java.util.StringTokenizer;
 
 public class Node {
 
@@ -34,11 +31,11 @@ public class Node {
 
     }
 
-    public static void send(String messsage, String ip, int port) {
-        System.out.println("Sending " + messsage + " to " + ip + ":" + port);
+    public static void send(Communicator request) {
+        System.out.println(request);
         try {
-            DatagramPacket packet = new DatagramPacket(messsage.getBytes(), messsage.getBytes().length,
-                    InetAddress.getByName(ip), port);
+            DatagramPacket packet = new DatagramPacket(request.getMessage().getBytes(), request.getMessage().getBytes().length,
+                    InetAddress.getByName(request.getHost()), request.getPort());
             socket.send(packet);
         } catch (IOException e) {
             System.out.println( e);
@@ -52,7 +49,7 @@ public class Node {
                 socket = new DatagramSocket(2224);
                 Neighbour neigh = new Neighbour("127.0.0.1", 2224, "123dinssq");
                 String reply = Register(neigh);
-                send(reply, "127.0.0.1", 55554);
+                send(new Communicator("127.0.0.1", 55554,reply));
                 done = false;
             }
             byte[] buffer = new byte[65536];
