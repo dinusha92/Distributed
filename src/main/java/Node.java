@@ -10,7 +10,7 @@ public class Node {
 
 
     private Neighbour predecessor, successor;
-    private ArrayList<Neighbour> finger = new ArrayList<>();
+    private ArrayList<Neighbour> finger = new ArrayList<Neighbour>();
     public static DatagramSocket socket;
 
     static DecimalFormat formatter = new DecimalFormat("0000");
@@ -48,7 +48,7 @@ public class Node {
                 socket = new DatagramSocket(2224);
                 Neighbour neigh = new Neighbour("127.0.0.1", 2224, "123dinssq");
                 String reply = Register(neigh);
-                send(new Communicator("127.0.0.1", 55554,reply));
+                send(new Communicator("127.0.0.1", 55555,reply));
                 done = false;
             }
             byte[] buffer = new byte[65536];
@@ -73,6 +73,7 @@ public class Node {
 
     private static void onResponseReceived(Communicator response) {
 
+        System.out.println(response);
         StringTokenizer tokenizer = new StringTokenizer(response.getMessage(), " ");
         String length = tokenizer.nextToken();
         String command = tokenizer.nextToken();
