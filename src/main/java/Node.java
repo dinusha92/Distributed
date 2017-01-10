@@ -10,7 +10,7 @@ import java.util.StringTokenizer;
 public class Node {
 
 
-    private Neighbour predecessor, successor;
+    private static Neighbour predecessor, successor;
     private ArrayList<Neighbour> finger = new ArrayList<Neighbour>();
     public static DatagramSocket socket;
     private static MovieHandler movieHandler;
@@ -51,8 +51,8 @@ public class Node {
         boolean done = true;
         while(true) {
             if(done) {
-                socket = new DatagramSocket(2224);
-                Neighbour neigh = new Neighbour("127.0.0.1", 2224, "123dinssq");
+                socket = new DatagramSocket(2222);
+                Neighbour neigh = new Neighbour("127.0.0.1", 2222, "123dinsq");
                 String reply = Register(neigh);
                 send(new Communicator("127.0.0.1", 55555,reply));
                 done = false;
@@ -79,10 +79,13 @@ public class Node {
 
     private static void onResponseReceived(Communicator response) {
 
-        System.out.println(response);
         StringTokenizer tokenizer = new StringTokenizer(response.getMessage(), " ");
         String length = tokenizer.nextToken();
+        System.out.println("length"+length);
         String command = tokenizer.nextToken();
+        System.out.println("co" + command);
+        String ip;
+        int port;
         if (Command.REGOK.equals(command)) {
             int no_nodes = Integer.parseInt(tokenizer.nextToken());
 
@@ -92,7 +95,9 @@ public class Node {
                     break;
 
                 case 1:
-
+                    ip = tokenizer.nextToken();
+                    port = Integer.parseInt(tokenizer.nextToken());
+                    connect(new Neighbour(ip,port,""));
                     break;
 
                 case 2:
@@ -119,7 +124,13 @@ public class Node {
         } else if (Command.UNROK.equals(command)) {
             System.out.println("Successfully unregistered this node");
         } else if (Command.JOIN.equals(command)) {
+            ip = tokenizer.nextToken();
+            port = Integer.parseInt(tokenizer.nextToken());
+            predecessor = new Neighbour(ip,port,"");
+            String reply = "0014 JOINOK 0";
+            send(new Communicator(ip,port,reply));
         } else if (Command.JOINOK.equals(command)) {
+
         } else if (Command.LEAVE.equals(command)) {
         } else if (Command.LEAVEOK.equals(command)) {
         } else if (Command.DISCON.equals(command)) {
@@ -167,6 +178,18 @@ public class Node {
         }
     }
 
+    private static void connect(Neighbour neighbour){
+        String ip = neighbour.getIp();
+        int port = neighbour.getPort();
+        String reply = " JOIN " + ip + " " + port;
+
+        String length_final = formatter.format(reply.length() + 4);
+        String final_reply = length_final  + reply;;
+        send(new Communicator(neighbour.getIp(),neighbour.getPort(),final_reply));
+    }
+    private void join(Neighbour node){
+
+    }
     private void createChordRing(){
 
     }
