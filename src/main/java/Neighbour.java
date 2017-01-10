@@ -20,4 +20,16 @@ class Neighbour{
     public int getPort(){
         return this.port;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null || getClass() != obj.getClass())
+            return false;
+        Neighbour neighbour = (Neighbour) obj;
+        if(port!=neighbour.getPort())
+            return false;
+        else if(ip.equals(neighbour.getIp()))
+            return true;
+        else return false;
+    }
 }
