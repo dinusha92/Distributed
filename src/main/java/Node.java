@@ -4,6 +4,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class Node {
@@ -12,8 +13,13 @@ public class Node {
     private Neighbour predecessor, successor;
     private ArrayList<Neighbour> finger = new ArrayList<Neighbour>();
     public static DatagramSocket socket;
+    private static MovieHandler movieHandler;
 
     static DecimalFormat formatter = new DecimalFormat("0000");
+
+    public Node (String fileName){
+        movieHandler = new MovieHandler(fileName);
+    }
 
     //length JOIN IP_address port_no
     public static String Register(Neighbour node){
@@ -119,6 +125,41 @@ public class Node {
         } else if (Command.DISCON.equals(command)) {
 
         } else if (Command.SER.equals(command)) {
+            String sourceIP = tokenizer.nextToken();
+            int sourcePort = Integer.parseInt(tokenizer.nextToken());
+            int hops = 0;
+            StringBuilder queryBuilder = new StringBuilder();
+            for (int i = 1; i < tokenizer.countTokens(); i++) {
+                queryBuilder.append(tokenizer.nextToken());
+                queryBuilder.append(' ');
+            }
+            String hopsToken = tokenizer.nextToken();
+            try {
+                //Check if hops are added in request
+                hops = Integer.parseInt(hopsToken);
+            } catch (NumberFormatException e) {
+                queryBuilder.append(hopsToken);
+            }
+            String fileName = queryBuilder.toString().trim();
+            List<String> moviesResult = movieHandler.searchMovies(fileName);
+            hops++;
+            //ToDo: Need to change all static methods to non static and complete join and pred, successor assignment
+            /*String resultString = "0114 SEROK " + results.size() + " 127.0.0.1 " + port + " " + hops;
+            for (int i = 0; i < moviesResult.size(); i++) {
+                resultString += " " + moviesResult.get(i);
+            }
+            send(resultString, sourceIP, sourcePort);
+
+            // Pass the message to neighbours
+            Neighbour sender = new Neighbour(senderIP, senderPort);
+            if (sender.equals() && right != null) {
+                // Pass the message to RIGHT
+                send(message, right.getIp(), right.getPort());
+            } else if (sender.equals(right) && left != null) {
+                // Pass the message to LEFT
+                send(message, left.getIp(), left.getPort());
+            }*/
+
         } else if (Command.SEROK.equals(command)) {
 
         } else if (Command.ERROR.equals(command)) {
