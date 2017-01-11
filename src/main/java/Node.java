@@ -51,8 +51,8 @@ public class Node {
         boolean done = true;
         while(true) {
             if(done) {
-                socket = new DatagramSocket(2223);
-                Neighbour neigh = new Neighbour("127.0.0.1", 2223, "123dinsq");
+                socket = new DatagramSocket(2226);
+                Neighbour neigh = new Neighbour("127.0.0.1", 2226, "123din");
                 String reply = Register(neigh);
                 send(new Communicator("127.0.0.1", 55555,reply));
                 done = false;
@@ -124,14 +124,17 @@ public class Node {
         } else if (Command.JOIN.equals(command)) {
             ip = tokenizer.nextToken();
             port = Integer.parseInt(tokenizer.nextToken());
-            predecessor = new Neighbour(ip,port,"");
+            System.out.println("details" + ip + " " + port);
+            successor = new Neighbour(ip,port,"");
             String reply = "0014 JOINOK 0";
             send(new Communicator(ip,port,reply));
         } else if (Command.JOINOK.equals(command)) {
+
             int value = Integer.parseInt(tokenizer.nextToken());
             if(value == 0){
-                System.out.println("OK");
+                System.out.println("JOIN Successful");
             }else {
+                
                 System.out.println("error");
             }
         } else if (Command.LEAVE.equals(command)) {
@@ -185,7 +188,7 @@ public class Node {
         String ip = neighbour.getIp();
         int port = neighbour.getPort();
         String reply = " JOIN " + ip + " " + port;
-
+        predecessor = new Neighbour(ip,port,"");
         String length_final = formatter.format(reply.length() + 4);
         String final_reply = length_final  + reply;;
         send(new Communicator(neighbour.getIp(),neighbour.getPort(),final_reply));
