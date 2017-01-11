@@ -14,6 +14,9 @@ public class Node {
     private ArrayList<Neighbour> finger = new ArrayList<Neighbour>();
     public static DatagramSocket socket;
     private static MovieHandler movieHandler;
+    private static String myIp="127.0.0.1";
+    private  static  int myPort  = 2228;
+    private static  String myUserName = "dingi1";
 
     static DecimalFormat formatter = new DecimalFormat("0000");
 
@@ -51,8 +54,8 @@ public class Node {
         boolean done = true;
         while(true) {
             if(done) {
-                socket = new DatagramSocket(2226);
-                Neighbour neigh = new Neighbour("127.0.0.1", 2226, "123din");
+                socket = new DatagramSocket(myPort);
+                Neighbour neigh = new Neighbour(myIp ,myPort, myUserName);
                 String reply = Register(neigh);
                 send(new Communicator("127.0.0.1", 55555,reply));
                 done = false;
@@ -72,6 +75,13 @@ public class Node {
                 System.out.println("dfdfdfsdfsd");
             }catch (IOException e){
                 System.out.println("ddaee");
+            }
+
+            if(predecessor!=null){
+                System.out.println("predecessor "+ predecessor.getIp() + " " + predecessor.getPort());
+            }
+            if(successor!=null){
+                System.out.println("successor "+ successor.getIp()+ " "+ successor.getPort());
             }
 
         }
@@ -187,7 +197,7 @@ public class Node {
     private static void connect(Neighbour neighbour){
         String ip = neighbour.getIp();
         int port = neighbour.getPort();
-        String reply = " JOIN " + ip + " " + port;
+        String reply = " JOIN " + myIp + " " + myPort;
         predecessor = new Neighbour(ip,port,"");
         String length_final = formatter.format(reply.length() + 4);
         String final_reply = length_final  + reply;;
