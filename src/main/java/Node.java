@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
 
 public class Node {
 
@@ -135,16 +136,22 @@ public class Node {
             ip = tokenizer.nextToken();
             port = Integer.parseInt(tokenizer.nextToken());
             System.out.println("details" + ip + " " + port);
-            successor = new Neighbour(ip,port,"");
-            String reply = "0014 JOINOK 0";
+            String reply;
+            try{
+                predecessor = new Neighbour(ip,port,"");
+                reply = "0013 JOINOK 0";
+            }catch (Error e){
+                reply = "0016 JOINOK 9999";
+            }
             send(new Communicator(ip,port,reply));
         } else if (Command.JOINOK.equals(command)) {
 
             int value = Integer.parseInt(tokenizer.nextToken());
             if(value == 0){
                 System.out.println("JOIN Successful");
-            }else {
-                
+            }
+            if(value == 9999){
+                successor = null;
                 System.out.println("error");
             }
         } else if (Command.LEAVE.equals(command)) {
@@ -198,7 +205,7 @@ public class Node {
         String ip = neighbour.getIp();
         int port = neighbour.getPort();
         String reply = " JOIN " + myIp + " " + myPort;
-        predecessor = new Neighbour(ip,port,"");
+        successor = new Neighbour(ip,port,"");
         String length_final = formatter.format(reply.length() + 4);
         String final_reply = length_final  + reply;;
         send(new Communicator(neighbour.getIp(),neighbour.getPort(),final_reply));
