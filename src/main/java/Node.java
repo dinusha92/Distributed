@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.StringTokenizer;
 
 public class Node {
@@ -15,8 +16,8 @@ public class Node {
     public static DatagramSocket socket;
     private static MovieHandler movieHandler;
     private static String myIp="127.0.0.1";
-    private  static  int myPort  = 2228;
-    private static  String myUserName = "dingi1";
+    private  static  int myPort  = 2225;
+    private static  String myUserName = "dingi1234";
 
     static DecimalFormat formatter = new DecimalFormat("0000");
 
@@ -109,7 +110,17 @@ public class Node {
                     break;
 
                 case 2:
+                    Random rnd= new Random();
 
+                    //select random node from the given two nodes
+                    if(rnd.nextInt()%2==0){
+                        tokenizer.nextToken();
+                        Integer.parseInt(tokenizer.nextToken());
+                    }
+                    ip = tokenizer.nextToken();
+                    port = Integer.parseInt(tokenizer.nextToken());
+
+                    connect(new Neighbour(ip,port,""));
                     break;
 
                 case 9996:
