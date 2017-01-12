@@ -27,30 +27,6 @@ public class Node {
         myUserName= userName;
         movieHandler = new MovieHandler(fileName);
     }
-    //length PredecessorJOIN IP_address port_no
-    private  String Register(Neighbour node){
-        String ip = node.getIp();
-        int port  = node.getPort();
-        String username = node.getUsername();
-
-        String msg = Command.REG+" " + ip + " " + port + " " + username;
-        String length_final = formatter.format(msg.length() + 5);
-        return length_final + " " + msg;
-
-    }
-
-
-
-    private  void send(Communicator request) {
-        System.out.println("***** sending ; "+request);
-        try {
-            DatagramPacket packet = new DatagramPacket(request.getMessage().getBytes(), request.getMessage().getBytes().length,
-                    InetAddress.getByName(request.getIp()), request.getPort());
-            socket.send(packet);
-        } catch (IOException e) {
-            System.out.println( e);
-        }
-    }
 
     public  void run() throws IOException {
 
@@ -174,17 +150,11 @@ public class Node {
             predecessorConnect(new Neighbour(ip,port,""));
         } else if (Command.SuccessorJOINOK.equals(command)) {
 
-            int value = Integer.parseInt(tokenizer.nextToken());
-            if(value == 0){
-                System.out.println("PredecessorJOIN Successful");
-            }else {
-
-                System.out.println("error");
-            }
         } else if (Command.LEAVE.equals(command)) {
+            successorConnect(new Neighbour(predecessor.getIp(),predecessor.getPort(),""),new Neighbour(successor.getIp(),successor.getPort(),""));
         } else if (Command.LEAVEOK.equals(command)) {
         } else if (Command.DISCON.equals(command)) {
-
+            unRegister();
         } else if (Command.SER.equals(command)) {
             String sourceIP = tokenizer.nextToken();
             int sourcePort = Integer.parseInt(tokenizer.nextToken());
@@ -253,6 +223,7 @@ public class Node {
                     System.out.println("\t" + tokenizer.nextToken());
                 }
             }
+            System.out.println("No. of hops = "+hops);
         } else if (Command.ERROR.equals(command)) {
         } else {
         }
@@ -274,5 +245,35 @@ public class Node {
         String length_final = formatter.format(reply.length() + 4);
         String final_reply = length_final  + reply;
         send(new Communicator(receiver.getIp(),receiver.getPort(),final_reply));
+    }
+
+    private  String Register(Neighbour node){
+        String ip = node.getIp();
+        int port  = node.getPort();
+        String username = node.getUsername();
+
+        String msg = Command.REG+" " + ip + " " + port + " " + username;
+        String length_final = formatter.format(msg.length() + 5);
+        return length_final + " " + msg;
+
+    }
+
+    private  String unRegister(){
+
+        String msg = Command.UNREG+" " + myIp + " " + myPort + " " + myUserName;
+        String length_final = formatter.format(msg.length() + 5);
+        return length_final + " " + msg;
+
+    }
+
+    private  void send(Communicator request) {
+        System.out.println("***** sending ; "+request);
+        try {
+            DatagramPacket packet = new DatagramPacket(request.getMessage().getBytes(), request.getMessage().getBytes().length,
+                    InetAddress.getByName(request.getIp()), request.getPort());
+            socket.send(packet);
+        } catch (IOException e) {
+            System.out.println( e);
+        }
     }
 }

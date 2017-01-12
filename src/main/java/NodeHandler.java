@@ -19,7 +19,7 @@ public class NodeHandler {
 
 
 //        try {
-//            String msg="0024 SER 127.0.0.1 2227 Happy Feet 5 0";
+//            String msg="0024 SER 127.0.0.1 2227 8 5 0";
 //            DatagramSocket socket = new DatagramSocket(2219);
 //            DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.getBytes().length,
 //                    InetAddress.getByName("127.0.0.1"),2227);
