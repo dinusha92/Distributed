@@ -209,14 +209,14 @@ public class Node {
                 resultString += " " + moviesResult.get(i);
             }
             send(new Communicator(sourceIP,sourcePort,resultString));
-            Neighbour sender = new Neighbour(sourceIP,sourcePort,"");
-            if (sender.equals(predecessor) && successor != null) {
-                // Pass the message to Successor
-                send(new Communicator(successor.getIp(), successor.getPort(),response.getMessage()));
-            } else if (sender.equals(successor) && predecessor != null) {
-                // Pass the message to Predecessor
-                send(new Communicator(predecessor.getIp(),predecessor.getPort(),response.getMessage()));
-            }
+//            Neighbour sender = new Neighbour(sourceIP,sourcePort,"");
+//            if (sender.equals(predecessor) && successor != null) {
+//                // Pass the message to Successor
+//            } else if (sender.equals(successor) && predecessor != null) {
+//                // Pass the message to Predecessor
+//                send(new Communicator(predecessor.getIp(),predecessor.getPort(),response.getMessage()));
+//            }
+            send(new Communicator(successor.getIp(), successor.getPort(),response.getMessage()));
 
         } else if (Command.SEROK.equals(command)) {
             int fileCount = Integer.parseInt(tokenizer.nextToken());
