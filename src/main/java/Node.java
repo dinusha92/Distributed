@@ -167,7 +167,7 @@ public class Node {
             if(value == 0){
                 System.out.println("PredecessorJOIN Successful");
             }else {
-                
+
                 System.out.println("error");
             }
         } else if (Command.SuccessorJOIN.equals(command)) {
