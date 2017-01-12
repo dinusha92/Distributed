@@ -12,23 +12,20 @@ public class Node {
 
 
     private  Neighbour predecessor, successor;
-    private ArrayList<Neighbour> finger = new ArrayList<Neighbour>();
+    private  ArrayList<Neighbour> finger = new ArrayList<Neighbour>();
     private  DatagramSocket socket;
     private  MovieHandler movieHandler;
     private  String myIp="127.0.0.1";
-    private    int myPort  = 2223;
-    private   String myUserName = "dingi123";
+    private  int myPort  = 2223;
+    private  String myUserName = "dingi123";
 
      DecimalFormat formatter = new DecimalFormat("0000");
 
-    public Node (String fileName){
-        movieHandler = new MovieHandler(fileName);
-    }
-
-    public Node (String userName, String ip, int port){
+    public Node (String userName, String ip, int port,String fileName){
         myIp=ip;
         myPort= port;
         myUserName= userName;
+        movieHandler = new MovieHandler(fileName);
     }
     //length PredecessorJOIN IP_address port_no
     private  String Register(Neighbour node){

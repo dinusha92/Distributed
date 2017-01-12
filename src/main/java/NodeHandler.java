@@ -5,7 +5,7 @@ import java.io.IOException;
  */
 public class NodeHandler {
     public static void main(String[] args) {
-        Node node = new Node("user12", "127.0.0.1",2225);
+        Node node = new Node("user12", "127.0.0.1",2225,"movies.txt");
         try {
             node.run();
         } catch (IOException e) {
