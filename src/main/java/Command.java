@@ -12,9 +12,13 @@ public class Command {
 
     public static final String UNROK = "UNROK";
 
-    public static final String JOIN = "JOIN";
+    public static final String PredecessorJOIN = "JOIN";
 
-    public static final String JOINOK = "JOINOK";
+    public static final String PredecessorJOINOK = "JOINOK";
+
+    public static final String SuccessorJOIN = "SJOIN";
+
+    public static final String SuccessorJOINOK = "SJOINOK";
 
     public static final String LEAVE = "LEAVE";
 

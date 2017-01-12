@@ -5,39 +5,44 @@ import java.net.InetAddress;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.StringTokenizer;
 
 public class Node {
 
 
-    private static Neighbour predecessor, successor;
-    private ArrayList<Neighbour> finger = new ArrayList<Neighbour>();
-    public static DatagramSocket socket;
-    private static MovieHandler movieHandler;
+    private  Neighbour predecessor, successor;
+    private  ArrayList<Neighbour> finger = new ArrayList<Neighbour>();
+    private  DatagramSocket socket;
+    private  MovieHandler movieHandler;
+    private  String myIp="127.0.0.1";
+    private  int myPort  = 2223;
+    private  String myUserName = "dingi123";
 
-    static DecimalFormat formatter = new DecimalFormat("0000");
+     DecimalFormat formatter = new DecimalFormat("0000");
 
-    public Node (String fileName){
+    public Node (String userName, String ip, int port,String fileName){
+        myIp=ip;
+        myPort= port;
+        myUserName= userName;
         movieHandler = new MovieHandler(fileName);
     }
-
-    //length JOIN IP_address port_no
-    public static String Register(Neighbour node){
+    //length PredecessorJOIN IP_address port_no
+    private  String Register(Neighbour node){
         String ip = node.getIp();
         int port  = node.getPort();
         String username = node.getUsername();
 
         String msg = Command.REG+" " + ip + " " + port + " " + username;
         String length_final = formatter.format(msg.length() + 5);
-        String reply = length_final + " " + msg;
-        return reply;
+        return length_final + " " + msg;
 
     }
 
 
 
-    public static void send(Communicator request) {
-        System.out.println(request);
+    private  void send(Communicator request) {
+        System.out.println("***** sending ; "+request);
         try {
             DatagramPacket packet = new DatagramPacket(request.getMessage().getBytes(), request.getMessage().getBytes().length,
                     InetAddress.getByName(request.getIp()), request.getPort());
@@ -47,12 +52,14 @@ public class Node {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public  void run() throws IOException {
+
+        System.out.println("my ip and port = "+myIp+" : "+myPort);
         boolean done = true;
         while(true) {
             if(done) {
-                socket = new DatagramSocket(2222);
-                Neighbour neigh = new Neighbour("127.0.0.1", 2222, "123dinsq");
+                socket = new DatagramSocket(myPort);
+                Neighbour neigh = new Neighbour(myIp ,myPort, myUserName);
                 String reply = Register(neigh);
                 send(new Communicator("127.0.0.1", 55555,reply));
                 done = false;
@@ -66,24 +73,30 @@ public class Node {
                 String message = new String(data, 0, packet.getLength());
 
                 Communicator response = new Communicator(packet.getAddress().getHostAddress(), packet.getPort(), message);
+                System.out.println("receiving ; "+ response);
                 onResponseReceived(response);
 
 
-                System.out.println("dfdfdfsdfsd");
+
             }catch (IOException e){
                 System.out.println("ddaee");
+            }
+
+            if(predecessor!=null){
+                System.out.println("predecessor "+ predecessor.getIp() + " " + predecessor.getPort());
+            }
+            if(successor!=null){
+                System.out.println("successor "+ successor.getIp()+ " "+ successor.getPort());
             }
 
         }
     }
 
-    private static void onResponseReceived(Communicator response) {
+    private  void onResponseReceived(Communicator response) {
 
         StringTokenizer tokenizer = new StringTokenizer(response.getMessage(), " ");
         String length = tokenizer.nextToken();
-        System.out.println("length"+length);
         String command = tokenizer.nextToken();
-        System.out.println("co" + command);
         String ip;
         int port;
         if (Command.REGOK.equals(command)) {
@@ -97,11 +110,22 @@ public class Node {
                 case 1:
                     ip = tokenizer.nextToken();
                     port = Integer.parseInt(tokenizer.nextToken());
-                    connect(new Neighbour(ip,port,""));
+                    predecessorConnect(new Neighbour(ip,port,""));
+                    successorConnect(new Neighbour(myIp,myPort,""),new Neighbour(ip,port,""));
                     break;
 
                 case 2:
+                    Random rnd= new Random();
 
+                    //select random node from the given two nodes
+                    if(rnd.nextInt()%2==0){     //randomly consume one ip and port
+                        tokenizer.nextToken();
+                        Integer.parseInt(tokenizer.nextToken());
+                    }
+                    ip = tokenizer.nextToken();
+                    port = Integer.parseInt(tokenizer.nextToken());
+
+                    predecessorConnect(new Neighbour(ip,port,""));
                     break;
 
                 case 9996:
@@ -123,14 +147,40 @@ public class Node {
 
         } else if (Command.UNROK.equals(command)) {
             System.out.println("Successfully unregistered this node");
-        } else if (Command.JOIN.equals(command)) {
+        } else if (Command.PredecessorJOIN.equals(command)) {
             ip = tokenizer.nextToken();
             port = Integer.parseInt(tokenizer.nextToken());
-            predecessor = new Neighbour(ip,port,"");
-            String reply = "0014 JOINOK 0";
-            send(new Communicator(ip,port,reply));
-        } else if (Command.JOINOK.equals(command)) {
+            System.out.println("details" + ip + " " + port);
 
+            if(successor!=null){
+                successorConnect(new Neighbour(ip,port,""),successor);
+            }
+            successor = new Neighbour(ip,port,"");
+            String reply = "0014 "+Command.PredecessorJOINOK+" 0";
+            send(new Communicator(ip,port,reply));
+        } else if (Command.PredecessorJOINOK.equals(command)) {
+
+            int value = Integer.parseInt(tokenizer.nextToken());
+            if(value == 0){
+                System.out.println("PredecessorJOIN Successful");
+            }else {
+
+                System.out.println("error");
+            }
+        } else if (Command.SuccessorJOIN.equals(command)) {
+            ip = tokenizer.nextToken();
+            port = Integer.parseInt(tokenizer.nextToken());
+
+            predecessorConnect(new Neighbour(ip,port,""));
+        } else if (Command.SuccessorJOINOK.equals(command)) {
+
+            int value = Integer.parseInt(tokenizer.nextToken());
+            if(value == 0){
+                System.out.println("PredecessorJOIN Successful");
+            }else {
+
+                System.out.println("error");
+            }
         } else if (Command.LEAVE.equals(command)) {
         } else if (Command.LEAVEOK.equals(command)) {
         } else if (Command.DISCON.equals(command)) {
@@ -178,48 +228,23 @@ public class Node {
         }
     }
 
-    private static void connect(Neighbour neighbour){
-        String ip = neighbour.getIp();
-        int port = neighbour.getPort();
-        String reply = " JOIN " + ip + " " + port;
+    private  void predecessorConnect(Neighbour receiver){
+        String ip = receiver.getIp();
+        int port = receiver.getPort();
+        String reply = " "+Command.PredecessorJOIN +" " + myIp + " " + myPort;
+        predecessor = new Neighbour(ip,port,"");
+        String length_final = formatter.format(reply.length() + 4);
+        String final_reply = length_final  + reply;;
+        send(new Communicator(receiver.getIp(),receiver.getPort(),final_reply));
+    }
+
+    private  void successorConnect(Neighbour neighbour, Neighbour receiver){
+        String reply = " "+Command.SuccessorJOIN+" " + neighbour.getIp() + " " + neighbour.getPort();
 
         String length_final = formatter.format(reply.length() + 4);
         String final_reply = length_final  + reply;;
-        send(new Communicator(neighbour.getIp(),neighbour.getPort(),final_reply));
-    }
-    private void join(Neighbour node){
-
-    }
-    private void createChordRing(){
-
+        send(new Communicator(receiver.getIp(),receiver.getPort(),final_reply));
     }
 
-    private static void joinNode(Neighbour node){
-
-    }
-
-    private  static void stabilize(){
-
-    }
-
-    private static void notifyNodes(){
-
-    }
-
-    private static  void fix_fingers(){
-
-    }
-
-    private static void check_predecessor(){
-
-    }
-
-    private static void find_successor (){
-
-    }
-
-    private static void closest_preceding_node(){
-
-    }
 
 }
