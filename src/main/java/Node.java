@@ -3,7 +3,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
@@ -105,6 +104,7 @@ public class Node {
 
                 case 9997:
                     System.out.println("Failed to register. This ip and port is already used by another Node.");
+                    closeSocket();
                     break;
 
                 case 9998:
@@ -113,11 +113,13 @@ public class Node {
 
                 case 9999:
                     System.out.println("Error in the command. Please fix the error");
+                    closeSocket();
                     break;
             }
 
         } else if (Command.UNROK.equals(command)) {
             System.out.println("Successfully unregistered this node");
+            closeSocket();
 
         } else if (Command.PredecessorJOIN.equals(command)) {
             ip = tokenizer.nextToken();
@@ -216,6 +218,9 @@ public class Node {
             }
             System.out.println("No. of hops = "+hops);
         } else if (Command.ERROR.equals(command)) {
+            System.out.println("Error");
+            closeSocket();
+
         } else {
         }
     }
@@ -259,6 +264,15 @@ public class Node {
             socket.send(packet);
         } catch (IOException e) {
             System.out.println( e);
+        }
+    }
+
+    public void closeSocket() {
+        if (socket != null) {
+            if (!socket.isClosed()) {
+                socket.close();
+                socket = null;
+            }
         }
     }
 }
