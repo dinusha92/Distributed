@@ -25,6 +25,7 @@ public class MovieHandler {
         int num = rand.nextInt(3) + 3;
         for (int i = 0; i < num; i++){
             movies.add(moviesList.get(i));
+            System.out.println(moviesList.get(i));
         }
         return movies;
     }

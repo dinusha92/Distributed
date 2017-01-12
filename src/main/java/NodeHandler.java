@@ -8,22 +8,24 @@ import java.net.InetAddress;
  */
 public class NodeHandler {
     public static void main(String[] args) {
-//        Node node = new Node("user123", "127.0.0.1",2228,"movies.txt");
-//        try {
-//            node.run();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
-
+        //comment this and uncomment below section when running search cmd
+        Node node = new Node("user123", "127.0.0.1",2228,"movies.txt");
         try {
-            String msg="0024 SER 127.0.0.1 2227 Microsoft Office 2010 10";
-            DatagramSocket socket = new DatagramSocket(2219);
-            DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.getBytes().length,
-                    InetAddress.getByName("127.0.0.1"),2227);
-            socket.send(packet);
+            node.run();
         } catch (IOException e) {
-            System.out.println( e);
+            e.printStackTrace();
         }
+
+
+//        try {
+//            String msg="0024 SER 127.0.0.1 2227 Happy Feet 5 0";
+//            DatagramSocket socket = new DatagramSocket(2219);
+//            DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.getBytes().length,
+//                    InetAddress.getByName("127.0.0.1"),2227);
+//            socket.send(packet);
+//        } catch (IOException e) {
+//            System.out.println( e);
+//        }
     }
 }

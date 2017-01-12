@@ -188,18 +188,21 @@ public class Node {
         } else if (Command.SER.equals(command)) {
             String sourceIP = tokenizer.nextToken();
             int sourcePort = Integer.parseInt(tokenizer.nextToken());
-            int hops = 0;
+            int hopLimit = 0,hops=0;
             StringBuilder queryBuilder = new StringBuilder();
-            for (int i = 1; i < tokenizer.countTokens(); i++) {
+            int tokenCount=tokenizer.countTokens();
+            for (int i = 2; i < tokenCount; i++) {
                 queryBuilder.append(tokenizer.nextToken());
                 queryBuilder.append(' ');
             }
+            String hopLimitToken = tokenizer.nextToken();
             String hopsToken = tokenizer.nextToken();
             try {
                 //Check if hops are added in request
+                hopLimit = Integer.parseInt(hopLimitToken);
                 hops = Integer.parseInt(hopsToken);
             } catch (NumberFormatException e) {
-                queryBuilder.append(hopsToken);
+                queryBuilder.append(hopLimitToken);
             }
             String fileName = queryBuilder.toString().trim();
             List<String> moviesResult = movieHandler.searchMoviesList(fileName);
@@ -208,7 +211,17 @@ public class Node {
             for (int i = 0; i < moviesResult.size(); i++) {
                 resultString += " " + moviesResult.get(i);
             }
-            send(new Communicator(sourceIP,sourcePort,resultString));
+
+            if(moviesResult.size() >0||hops>=hopLimit) {
+                send(new Communicator(sourceIP, sourcePort, resultString));
+            }
+            else
+            {
+                String msg= " "+Command.SER+" "+sourceIP+" "+sourcePort+" "+fileName+" "+hopLimit+" "+hops;
+                String length_final = formatter.format(msg.length() + 4);
+                String final_reply = length_final  + msg;
+                send(new Communicator(successor.getIp(), successor.getPort(),final_reply));
+            }
 //            Neighbour sender = new Neighbour(sourceIP,sourcePort,"");
 //            if (sender.equals(predecessor) && successor != null) {
 //                // Pass the message to Successor
@@ -216,7 +229,6 @@ public class Node {
 //                // Pass the message to Predecessor
 //                send(new Communicator(predecessor.getIp(),predecessor.getPort(),response.getMessage()));
 //            }
-            send(new Communicator(successor.getIp(), successor.getPort(),response.getMessage()));
 
         } else if (Command.SEROK.equals(command)) {
             int fileCount = Integer.parseInt(tokenizer.nextToken());
@@ -260,7 +272,7 @@ public class Node {
         String reply = " "+Command.SuccessorJOIN+" " + neighbour.getIp() + " " + neighbour.getPort();
 
         String length_final = formatter.format(reply.length() + 4);
-        String final_reply = length_final  + reply;;
+        String final_reply = length_final  + reply;
         send(new Communicator(receiver.getIp(),receiver.getPort(),final_reply));
     }
 }
