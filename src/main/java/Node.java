@@ -10,16 +10,13 @@ import java.util.StringTokenizer;
 
 public class Node {
 
-
     private  Neighbour predecessor, successor;
-    private  ArrayList<Neighbour> finger = new ArrayList<Neighbour>();
     private  DatagramSocket socket;
     private  MovieHandler movieHandler;
-    private  String myIp="127.0.0.1";
-    private  int myPort  = 2223;
-    private  String myUserName = "dingi123";
-
-     DecimalFormat formatter = new DecimalFormat("0000");
+    private  String myIp;
+    private  int myPort;
+    private  String myUserName;
+    private  DecimalFormat formatter = new DecimalFormat("0000");
 
     public Node (String userName, String ip, int port,String fileName){
         myIp=ip;
@@ -35,8 +32,7 @@ public class Node {
         while(true) {
             if(done) {
                 socket = new DatagramSocket(myPort);
-                Neighbour neigh = new Neighbour(myIp ,myPort, myUserName);
-                String reply = Register(neigh);
+                String reply = Register();
                 send(new Communicator("127.0.0.1", 55555,reply));
                 done = false;
             }
@@ -52,10 +48,8 @@ public class Node {
                 System.out.println("receiving ; "+ response);
                 onResponseReceived(response);
 
-
-
             }catch (IOException e){
-                System.out.println("ddaee");
+                e.printStackTrace();
             }
 
             if(predecessor!=null){
@@ -68,6 +62,7 @@ public class Node {
         }
     }
 
+    //will be invoked when a response is received
     private  void onResponseReceived(Communicator response) {
 
         StringTokenizer tokenizer = new StringTokenizer(response.getMessage(), " ");
@@ -123,38 +118,41 @@ public class Node {
 
         } else if (Command.UNROK.equals(command)) {
             System.out.println("Successfully unregistered this node");
+
         } else if (Command.PredecessorJOIN.equals(command)) {
             ip = tokenizer.nextToken();
             port = Integer.parseInt(tokenizer.nextToken());
-            System.out.println("details" + ip + " " + port);
-
             if(successor!=null){
                 successorConnect(new Neighbour(ip,port,""),successor);
             }
             successor = new Neighbour(ip,port,"");
             String reply = "0014 "+Command.PredecessorJOINOK+" 0";
             send(new Communicator(ip,port,reply));
+
         } else if (Command.PredecessorJOINOK.equals(command)) {
 
             int value = Integer.parseInt(tokenizer.nextToken());
             if(value == 0){
                 System.out.println("PredecessorJOIN Successful");
             }else {
-
                 System.out.println("error");
             }
+
         } else if (Command.SuccessorJOIN.equals(command)) {
             ip = tokenizer.nextToken();
             port = Integer.parseInt(tokenizer.nextToken());
-
             predecessorConnect(new Neighbour(ip,port,""));
+
         } else if (Command.SuccessorJOINOK.equals(command)) {
 
         } else if (Command.LEAVE.equals(command)) {
             successorConnect(new Neighbour(predecessor.getIp(),predecessor.getPort(),""),new Neighbour(successor.getIp(),successor.getPort(),""));
+
         } else if (Command.LEAVEOK.equals(command)) {
+
         } else if (Command.DISCON.equals(command)) {
             unRegister();
+
         } else if (Command.SER.equals(command)) {
             String sourceIP = tokenizer.nextToken();
             int sourcePort = Integer.parseInt(tokenizer.nextToken());
@@ -177,7 +175,7 @@ public class Node {
             String fileName = queryBuilder.toString().trim();
             List<String> moviesResult = movieHandler.searchMoviesList(fileName);
             hops++;
-            String resultString = "0114 SEROK " + moviesResult.size() + " 127.0.0.1 " + myPort + " " + hops;
+            String resultString = "0114 "+Command.SEROK+" " + moviesResult.size() + " 127.0.0.1 " + myPort + " " + hops;
             for (int i = 0; i < moviesResult.size(); i++) {
                 resultString += " " + moviesResult.get(i);
             }
@@ -192,13 +190,6 @@ public class Node {
                 String final_reply = length_final  + msg;
                 send(new Communicator(successor.getIp(), successor.getPort(),final_reply));
             }
-//            Neighbour sender = new Neighbour(sourceIP,sourcePort,"");
-//            if (sender.equals(predecessor) && successor != null) {
-//                // Pass the message to Successor
-//            } else if (sender.equals(successor) && predecessor != null) {
-//                // Pass the message to Predecessor
-//                send(new Communicator(predecessor.getIp(),predecessor.getPort(),response.getMessage()));
-//            }
 
         } else if (Command.SEROK.equals(command)) {
             int fileCount = Integer.parseInt(tokenizer.nextToken());
@@ -229,6 +220,7 @@ public class Node {
         }
     }
 
+    //used to connect a node as current node predecessor
     private  void predecessorConnect(Neighbour receiver){
         String ip = receiver.getIp();
         int port = receiver.getPort();
@@ -247,23 +239,16 @@ public class Node {
         send(new Communicator(receiver.getIp(),receiver.getPort(),final_reply));
     }
 
-    private  String Register(Neighbour node){
-        String ip = node.getIp();
-        int port  = node.getPort();
-        String username = node.getUsername();
-
-        String msg = Command.REG+" " + ip + " " + port + " " + username;
+    private  String Register(){
+        String msg = Command.REG+" " + myIp + " " + myPort + " " + myUserName;
         String length_final = formatter.format(msg.length() + 5);
         return length_final + " " + msg;
-
     }
 
     private  String unRegister(){
-
         String msg = Command.UNREG+" " + myIp + " " + myPort + " " + myUserName;
         String length_final = formatter.format(msg.length() + 5);
         return length_final + " " + msg;
-
     }
 
     private  void send(Communicator request) {
