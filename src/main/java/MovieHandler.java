@@ -6,10 +6,10 @@ public class MovieHandler {
     private List<String> moviesList = new ArrayList<String>();
 
     public MovieHandler(String file_name){
-        this.moviesList = getSelectedMovies(file_name);
+        this.moviesList = getMoviesList(file_name);
     }
 
-    private List<String> getSelectedMovies(String fileName) {
+    private List<String> getMoviesList(String fileName) {
         List<String> moviesList = new ArrayList<String>();
         List<String> movies = new ArrayList<String>();
         try {
@@ -29,7 +29,7 @@ public class MovieHandler {
         return movies;
     }
 
-    public List<String> searchMovies(String query){
+    public List<String> searchMoviesList(String query){
         List<String> list = new ArrayList<String>();
 
         if (query != null && !query.trim().equals("")) {

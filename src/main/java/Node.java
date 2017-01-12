@@ -202,27 +202,45 @@ public class Node {
                 queryBuilder.append(hopsToken);
             }
             String fileName = queryBuilder.toString().trim();
-            List<String> moviesResult = movieHandler.searchMovies(fileName);
+            List<String> moviesResult = movieHandler.searchMoviesList(fileName);
             hops++;
-            //ToDo: Need to change all static methods to non static and complete join and pred, successor assignment
-            /*String resultString = "0114 SEROK " + results.size() + " 127.0.0.1 " + port + " " + hops;
+            String resultString = "0114 SEROK " + moviesResult.size() + " 127.0.0.1 " + myPort + " " + hops;
             for (int i = 0; i < moviesResult.size(); i++) {
                 resultString += " " + moviesResult.get(i);
             }
-            send(resultString, sourceIP, sourcePort);
-
-            // Pass the message to neighbours
-            Neighbour sender = new Neighbour(senderIP, senderPort);
-            if (sender.equals() && right != null) {
-                // Pass the message to RIGHT
-                send(message, right.getIp(), right.getPort());
-            } else if (sender.equals(right) && left != null) {
-                // Pass the message to LEFT
-                send(message, left.getIp(), left.getPort());
-            }*/
+            send(new Communicator(sourceIP,sourcePort,resultString));
+            Neighbour sender = new Neighbour(sourceIP,sourcePort,"");
+            if (sender.equals(predecessor) && successor != null) {
+                // Pass the message to Successor
+                send(new Communicator(successor.getIp(), successor.getPort(),response.getMessage()));
+            } else if (sender.equals(successor) && predecessor != null) {
+                // Pass the message to Predecessor
+                send(new Communicator(predecessor.getIp(),predecessor.getPort(),response.getMessage()));
+            }
 
         } else if (Command.SEROK.equals(command)) {
+            int fileCount = Integer.parseInt(tokenizer.nextToken());
 
+            // Remove port and ip od origin
+            tokenizer.nextToken();
+            tokenizer.nextToken();
+
+            int hops = Integer.parseInt(tokenizer.nextToken());
+
+
+            if (fileCount == 0) {
+                System.out.println("No files found at " + response.getIp() + ":" + response.getPort());
+            }
+            if (fileCount == 1) {
+                System.out.println("1 file found at " + response.getIp() + ":" + response.getPort());
+                System.out.println("\t" + tokenizer.nextToken());
+            }
+            if (fileCount > 1) {
+                System.out.println(fileCount + " files found at " + response.getIp() + ":" + response.getPort());
+                for (int i = 0; i < fileCount; i++) {
+                    System.out.println("\t" + tokenizer.nextToken());
+                }
+            }
         } else if (Command.ERROR.equals(command)) {
         } else {
         }
@@ -245,6 +263,4 @@ public class Node {
         String final_reply = length_final  + reply;;
         send(new Communicator(receiver.getIp(),receiver.getPort(),final_reply));
     }
-
-
 }
