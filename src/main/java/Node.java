@@ -11,36 +11,40 @@ import java.util.StringTokenizer;
 public class Node {
 
 
-    private static Neighbour predecessor, successor;
+    private  Neighbour predecessor, successor;
     private ArrayList<Neighbour> finger = new ArrayList<Neighbour>();
-    public static DatagramSocket socket;
-    private static MovieHandler movieHandler;
-    private static String myIp="127.0.0.1";
-    private  static  int myPort  = 2223;
-    private static  String myUserName = "dingi123";
+    private  DatagramSocket socket;
+    private  MovieHandler movieHandler;
+    private  String myIp="127.0.0.1";
+    private    int myPort  = 2223;
+    private   String myUserName = "dingi123";
 
-    static DecimalFormat formatter = new DecimalFormat("0000");
+     DecimalFormat formatter = new DecimalFormat("0000");
 
     public Node (String fileName){
         movieHandler = new MovieHandler(fileName);
     }
 
+    public Node (String userName, String ip, int port){
+        myIp=ip;
+        myPort= port;
+        myUserName= userName;
+    }
     //length PredecessorJOIN IP_address port_no
-    public static String Register(Neighbour node){
+    private  String Register(Neighbour node){
         String ip = node.getIp();
         int port  = node.getPort();
         String username = node.getUsername();
 
         String msg = Command.REG+" " + ip + " " + port + " " + username;
         String length_final = formatter.format(msg.length() + 5);
-        String reply = length_final + " " + msg;
-        return reply;
+        return length_final + " " + msg;
 
     }
 
 
 
-    public static void send(Communicator request) {
+    private  void send(Communicator request) {
         System.out.println("***** sending ; "+request);
         try {
             DatagramPacket packet = new DatagramPacket(request.getMessage().getBytes(), request.getMessage().getBytes().length,
@@ -51,7 +55,7 @@ public class Node {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public  void run() throws IOException {
 
         System.out.println("my ip and port = "+myIp+" : "+myPort);
         boolean done = true;
@@ -91,7 +95,7 @@ public class Node {
         }
     }
 
-    private static void onResponseReceived(Communicator response) {
+    private  void onResponseReceived(Communicator response) {
 
         StringTokenizer tokenizer = new StringTokenizer(response.getMessage(), " ");
         String length = tokenizer.nextToken();
@@ -227,7 +231,7 @@ public class Node {
         }
     }
 
-    private static void predecessorConnect(Neighbour receiver){
+    private  void predecessorConnect(Neighbour receiver){
         String ip = receiver.getIp();
         int port = receiver.getPort();
         String reply = " "+Command.PredecessorJOIN +" " + myIp + " " + myPort;
@@ -237,46 +241,13 @@ public class Node {
         send(new Communicator(receiver.getIp(),receiver.getPort(),final_reply));
     }
 
-    private static void successorConnect(Neighbour neighbour, Neighbour receiver){
+    private  void successorConnect(Neighbour neighbour, Neighbour receiver){
         String reply = " "+Command.SuccessorJOIN+" " + neighbour.getIp() + " " + neighbour.getPort();
 
         String length_final = formatter.format(reply.length() + 4);
         String final_reply = length_final  + reply;;
         send(new Communicator(receiver.getIp(),receiver.getPort(),final_reply));
     }
-    private void join(Neighbour node){
 
-    }
-    private void createChordRing(){
-
-    }
-
-    private static void joinNode(Neighbour node){
-
-    }
-
-    private  static void stabilize(){
-
-    }
-
-    private static void notifyNodes(){
-
-    }
-
-    private static  void fix_fingers(){
-
-    }
-
-    private static void check_predecessor(){
-
-    }
-
-    private static void find_successor (){
-
-    }
-
-    private static void closest_preceding_node(){
-
-    }
 
 }
