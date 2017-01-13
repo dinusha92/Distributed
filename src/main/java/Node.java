@@ -12,6 +12,19 @@ public class Node {
     private  Neighbour predecessor, successor;
     private  DatagramSocket socket;
     private  MovieHandler movieHandler;
+
+    public String getMyIp() {
+        return myIp;
+    }
+
+    public int getMyPort() {
+        return myPort;
+    }
+
+    public String getMyUserName() {
+        return myUserName;
+    }
+
     private  String myIp;
     private  int myPort;
     private  String myUserName;
