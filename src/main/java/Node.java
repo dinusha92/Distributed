@@ -41,13 +41,13 @@ public class Node {
 
         System.out.println("my ip and port = "+myIp+" : "+myPort);
         boolean done = true;
+        if(done) {
+            socket = new DatagramSocket(myPort);
+            String reply = Register();
+            send(new Communicator("127.0.0.1", 55555,reply));
+            done = false;
+        }
         while(true) {
-            if(done) {
-                socket = new DatagramSocket(myPort);
-                String reply = Register();
-                send(new Communicator("127.0.0.1", 55555,reply));
-                done = false;
-            }
             byte[] buffer = new byte[65536];
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             try{
@@ -57,19 +57,19 @@ public class Node {
                 String message = new String(data, 0, packet.getLength());
 
                 Communicator response = new Communicator(packet.getAddress().getHostAddress(), packet.getPort(), message);
-                System.out.println("receiving ; "+ response);
+ //               System.out.println("receiving ; "+ response);
                 onResponseReceived(response);
 
             }catch (IOException e){
                 e.printStackTrace();
             }
-
-            if(predecessor!=null){
-                System.out.println("predecessor "+ predecessor.getIp() + " " + predecessor.getPort());
-            }
-            if(successor!=null){
-                System.out.println("successor "+ successor.getIp()+ " "+ successor.getPort());
-            }
+//
+//            if(predecessor!=null){
+//                System.out.println("predecessor "+ predecessor.getIp() + " " + predecessor.getPort());
+//            }
+//            if(successor!=null){
+//                System.out.println("successor "+ successor.getIp()+ " "+ successor.getPort());
+//            }
 
         }
     }
@@ -148,7 +148,7 @@ public class Node {
 
             int value = Integer.parseInt(tokenizer.nextToken());
             if(value == 0){
-                System.out.println("PredecessorJOIN Successful");
+ //               System.out.println("PredecessorJOIN Successful");
             }else {
                 System.out.println("error");
             }
@@ -162,11 +162,14 @@ public class Node {
 
         } else if (Command.LEAVE.equals(command)) {
             successorConnect(new Neighbour(predecessor.getIp(),predecessor.getPort(),""),new Neighbour(successor.getIp(),successor.getPort(),""));
-
+            successor = null;
+            predecessor = null;
+            send(new Communicator("127.0.0.1",55555,unRegister()));
+            System.exit(0);
         } else if (Command.LEAVEOK.equals(command)) {
 
         } else if (Command.DISCON.equals(command)) {
-            unRegister();
+
 
         } else if (Command.SER.equals(command)) {
             String sourceIP = tokenizer.nextToken();
@@ -190,12 +193,13 @@ public class Node {
             String fileName = queryBuilder.toString().trim();
             List<String> moviesResult = movieHandler.searchMoviesList(fileName);
             hops++;
-            String resultString = "0114 "+Command.SEROK+" " + moviesResult.size() + " 127.0.0.1 " + myPort + " " + hops;
+            String resultString = " "+Command.SEROK+" " + moviesResult.size() + " " + myIp + " " + myPort + " " + hops;
+            resultString = String.format("%4d",resultString.length() + 4) + resultString;
             for (int i = 0; i < moviesResult.size(); i++) {
                 resultString += " " + moviesResult.get(i);
             }
 
-            if(moviesResult.size() >0||hops>=hopLimit) {
+            if(moviesResult.size() >0||hops>=hopLimit || successor == null) {
                 send(new Communicator(sourceIP, sourcePort, resultString));
             }
             else
@@ -270,7 +274,7 @@ public class Node {
     }
 
     private  void send(Communicator request) {
-        System.out.println("***** sending ; "+request);
+        //System.out.println("***** sending ; "+request);
         try {
             DatagramPacket packet = new DatagramPacket(request.getMessage().getBytes(), request.getMessage().getBytes().length,
                     InetAddress.getByName(request.getIp()), request.getPort());
