@@ -1,13 +1,19 @@
+import java.text.DecimalFormat;
+
 public class Communicator {
 	private String ip;
 	private int port;
 	private String message;
 
-	public Communicator(String ip, int port, String message) {
+	private DecimalFormat formatter = new DecimalFormat("0000");
+
+	public Communicator(Node node, String message) {
 		super();
-		this.ip = ip;
-		this.port = port;
-		this.message = message;
+		this.ip = node.getIp();
+		this.port = node.getPort();
+
+		String length_final = formatter.format(message.length() + 5);
+		this.message = length_final + " " + message;
 	}
 
 	public String getIp() {
