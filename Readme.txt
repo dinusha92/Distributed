@@ -9,6 +9,8 @@ Then a menu will be appeared asking whether to search or a leave the network.
 
 Option 1 would search the movie and return the address of the holder.
 Option 2 would leave the network by unregistering from the bootstrap.
+Option 3 would print movie liston the terminal.
+Option 4 would print peer list on the terminal.
 
 
 Group :
