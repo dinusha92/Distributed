@@ -8,7 +8,25 @@ public class Query implements Serializable {
     private Node origin;
     private String queryText;
     private long timestamp;
+    private String sep = "@";
 
+    public  Query(String encodedQuery){
+        String [] str = encodedQuery.split(sep);
+        hops = Integer.parseInt(str[0]);
+        sender = new Node(str[1]);
+        origin = new Node(str[2]);
+        queryText = str[3];
+        timestamp = Long.parseLong(str[4]);
+    }
+
+    public Query(){
+
+    }
+
+    public  String getEncodedQuery(){
+        return  hops+ sep +sender.getEncodedNode()+ sep +origin.getEncodedNode()
+                + sep +queryText+ sep +timestamp;
+    }
     public int getHops() {
         return hops;
     }

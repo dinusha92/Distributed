@@ -5,12 +5,13 @@ public class Node implements Serializable {
     private String ip;
     private int port;
     private String username;
+    private String sep="#";
 
     public Node() {
     }
 
     public Node(String encodedString) {
-        String [] str= encodedString.split("-");
+        String [] str= encodedString.split(sep);
         ip = str[0];
         port = Integer.parseInt(str[1]);
         username = str[2];
@@ -65,8 +66,8 @@ public class Node implements Serializable {
 
     }
 
-    String getEncodedString(){
-        return ip+"-"+port+"-"+username;
+    String getEncodedNode(){
+        return ip+sep+port+sep+username;
     }
 
     @Override

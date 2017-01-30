@@ -3,10 +3,24 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class MovieHandler {
-    private List<String> moviesList = new ArrayList<String>();
+    private static MovieHandler instance;
 
-    public MovieHandler(String file_name){
-        this.moviesList = getMoviesList(file_name);
+    private List<String> movies = new ArrayList<String>();
+
+    public static MovieHandler getInstance(String path) {
+        if (instance == null) {
+            synchronized (MovieHandler.class) {
+                if (instance == null) {
+                    instance = new MovieHandler(path);
+                }
+            }
+        }
+
+        return instance;
+    }
+
+    private MovieHandler(String fileName) {
+        this.movies = getMoviesList(fileName);
     }
 
     private List<String> getMoviesList(String fileName) {
@@ -25,7 +39,6 @@ public class MovieHandler {
         int num = rand.nextInt(3) + 3;
         for (int i = 0; i < num; i++){
             movies.add(moviesList.get(i));
-            System.out.println(moviesList.get(i));
         }
         return movies;
     }
@@ -35,7 +48,7 @@ public class MovieHandler {
 
         if (query != null && !query.trim().equals("")) {
             query = query.toLowerCase();
-            for (String movie : moviesList) {
+            for (String movie : movies) {
                 if (movie.toLowerCase().contains(query)) {
                     // Remove the spaces
                     list.add(movie.replaceAll(" ", "_"));
@@ -43,5 +56,9 @@ public class MovieHandler {
             }
         }
         return list;
+    }
+
+    public List<String> getSelectedMovies() {
+        return this.movies;
     }
 }
