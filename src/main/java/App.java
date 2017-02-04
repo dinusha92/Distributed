@@ -49,10 +49,10 @@ public class App {
     }
 
     //will be invoked when a response is received
-    private void onResponseReceived(String messege) {
+    private void onResponseReceived(String message) {
 
         receivedMessages++;
-        StringTokenizer tokenizer = new StringTokenizer(messege, " ");
+        StringTokenizer tokenizer = new StringTokenizer(message, " ");
         String length = tokenizer.nextToken();
         String command = tokenizer.nextToken();
 
@@ -135,6 +135,7 @@ public class App {
                     moviesCount, result.getMovies().toString(), result.getHops(), result.getOwner().getIp(), result.getOwner().getPort(), latancy);
 
             latencyArray.add((int) latancy);
+            hopArray.add(result.getHops());
             echo(output);
 
         } else if (Command.ERROR.equals(command)) {
