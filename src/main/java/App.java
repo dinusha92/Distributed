@@ -41,7 +41,7 @@ public class App {
                 String message = new String(data, 0, packet.getLength());
 
 //                System.out.println("receiving ; " + message);
-                onResponseReceived(message);
+                onResponseReceived(message,new Node(packet.getAddress().getHostName(),packet.getPort()));
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -51,7 +51,7 @@ public class App {
     }
 
     //will be invoked when a response is received
-    private void onResponseReceived(String message) {
+    private void onResponseReceived(String message, Node sender) {
 
         receivedMessages++;
         StringTokenizer tokenizer = new StringTokenizer(message, " ");
@@ -146,14 +146,14 @@ public class App {
             closeSocket();
 
         } else if (Command.CLEAR.equals(command)) {
-            System.out.println("Cleared");
+            System.out.println("\nCleared\n");
             clearStats();
         }else if (Command.QUERY.equals(command)) {
             receivedMessages--;
             initiateSearch(tokenizer.nextToken());
         }else if (Command.STAT.equals(command)) {
             receivedMessages --;
-            send(new Communicator(new Node(tokenizer.nextToken()), " " + Command.STATOK + " " + getStats().getEncodedStat()));
+            send(new Communicator(sender, " " + Command.STATOK + " " + getStats().getEncodedStat()));
             System.out.println("Stat sent");
             sentMessages--;
         }else {
