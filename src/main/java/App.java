@@ -11,10 +11,11 @@ public class App {
     private final List<Node> neighbours = new ArrayList<>();
     private final List<Query> queryList = new ArrayList<>();
     private MovieHandler movieHandler = MovieHandler.getInstance("movies.txt");
-    private int receivedMessages, sentMessages,unAnswerdMessages;
+    private int receivedMessages, sentMessages, unAnsweredMessages;
     private List<Integer> latencyArray = new ArrayList<>();
     private List<Integer> hopArray = new ArrayList<>();
     private int localResultCounter=0;
+    private String localQuerry="";
 
     public App(Node bootstrapServer, Node currentNode) {
         thisNode = currentNode;
@@ -137,7 +138,7 @@ public class App {
 
             latencyArray.add((int) latancy);
             hopArray.add(result.getHops());
-            System.out.println("\nResult : "+ ++localResultCounter);
+            System.out.println("\nResult ["+localQuerry+"] : "+ ++localResultCounter);
             echo(output);
 
         } else if (Command.ERROR.equals(command)) {
@@ -145,6 +146,7 @@ public class App {
             closeSocket();
 
         } else if (Command.CLEAR.equals(command)) {
+            System.out.println("Cleared");
             clearStats();
         }else if (Command.QUERY.equals(command)) {
             receivedMessages--;
@@ -152,14 +154,15 @@ public class App {
         }else if (Command.STAT.equals(command)) {
             receivedMessages --;
             send(new Communicator(new Node(tokenizer.nextToken()), " " + Command.STATOK + " " + getStats().getEncodedStat()));
+            System.out.println("Stat sent");
             sentMessages--;
         }else {
-            unAnswerdMessages++;
+            unAnsweredMessages++;
         }
     }
     Stat getStats(){
         Stat stat = new Stat();
-        stat.setAnsweredMessages(receivedMessages-unAnswerdMessages);
+        stat.setAnsweredMessages(receivedMessages- unAnsweredMessages);
         stat.setSentMessages(sentMessages);
         stat.setReceivedMessages(receivedMessages);
         stat.setNodeDegree(neighbours.size());
@@ -181,6 +184,7 @@ public class App {
 
     synchronized void initiateSearch(String name) {
         localResultCounter=0;
+        localQuerry = name;
 
         Query query = new Query();
         query.setOrigin(thisNode);
@@ -212,7 +216,7 @@ public class App {
     synchronized private void search(Query query) {
 
         if (queryList.contains(query)) {
-            unAnswerdMessages++;
+            unAnsweredMessages++;
             return;
         } else {
             queryList.add(query);
@@ -350,8 +354,9 @@ public class App {
     void clearStats(){
         receivedMessages=0;
         sentMessages= 0;
-        unAnswerdMessages = 0;
+        unAnsweredMessages = 0;
         latencyArray= new ArrayList<>();
+        hopArray = new ArrayList<>();
     }
 
     private double getSD(Object[] latency, double mean){
