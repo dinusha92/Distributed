@@ -31,5 +31,13 @@ public class Command {
     public static final String SEROK = "SEROK";
 
     public static final String ERROR = "ERROR";
+
+    public static final String STAT = "STAT";
+
+    public static final String STATOK = "STATOK";
+
+    public static final String QUERY = "QUERY";
+
+    public static final String CLEAR = "CLEAR";
 }
 

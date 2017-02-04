@@ -5,14 +5,15 @@ public class Stat {
     private int receivedMessages;
     private int sentMessages;
     private int answeredMessages;
-    private int latencyMin;
-    private int latencyMax;
-    private double latencySD;
-    private double latencyAverage;
-    private int hopsMin;
-    private int hopsMax;
-    private double hopsSD;
-    private double hopsAverage;
+    private int nodeDegree;
+    private int latencyMin=0;
+    private int latencyMax=0;
+    private double latencySD=0;
+    private double latencyAverage=0;
+    private int hopsMin=0;
+    private int hopsMax=0;
+    private double hopsSD=0;
+    private double hopsAverage=0;
     private String sep = "#";
 
     public Stat(){
@@ -32,12 +33,13 @@ public class Stat {
         hopsMax = Integer.parseInt(str[8]);
         hopsSD = Double.parseDouble(str[9]);
         hopsAverage = Double.parseDouble(str[10]);
+        nodeDegree = Integer.parseInt(str[11]);
     }
 
     public String getEncodedStat(){
         return receivedMessages+sep+sentMessages+sep+answeredMessages+sep
                 +latencyMin+sep+latencyMax+sep+latencySD+sep+latencyAverage+sep
-                +hopsMin+sep+hopsMax+sep+hopsSD+hopsAverage+sep;
+                +hopsMin+sep+hopsMax+sep+hopsSD+sep+hopsAverage+sep+nodeDegree;
     }
 
     public int getReceivedMessages() {
@@ -126,5 +128,31 @@ public class Stat {
 
     public void setHopsAverage(double hopsAverage) {
         this.hopsAverage = hopsAverage;
+    }
+
+    @Override
+    public String toString() {
+        String out ="";
+        out+="Forwarded Messages\t:"+sentMessages+"\n";
+        out+="Received Messages\t:"+receivedMessages+"\n";
+        out+="Answered Messages\t:"+answeredMessages+"\n";
+        out+="Node degree\t:"+nodeDegree+"\n\n";
+        out+="Latency Min\t:"+latencyMin+"\n";
+        out+="Latency Max\t:"+latencyMax+"\n";
+        out+="Latency Average\t:"+latencyAverage+"\n";
+        out+="Latency SD\t:"+latencySD+"\n\n";
+        out+="Hops Min\t:"+hopsMin+"\n";
+        out+="Hops Max\t:"+hopsMax+"\n";
+        out+="Hops Average\t:"+hopsAverage+"\n";
+        out+="Hops SD\t:"+hopsSD+"\n";
+        return out;
+    }
+
+    public int getNodeDegree() {
+        return nodeDegree;
+    }
+
+    public void setNodeDegree(int nodeDegree) {
+        this.nodeDegree = nodeDegree;
     }
 }

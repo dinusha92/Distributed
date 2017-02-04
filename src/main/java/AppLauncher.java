@@ -61,7 +61,7 @@ public class AppLauncher extends Thread {
                             app.echoPeers();
                             break;
                         case 5:
-                            app.getStats();
+                            System.out.println(app.getStats().toString());
                             break;
                         case 6:
                             app.clearStats();

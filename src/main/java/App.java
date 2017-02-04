@@ -14,6 +14,7 @@ public class App {
     private int receivedMessages, sentMessages,unAnswerdMessages;
     private List<Integer> latencyArray = new ArrayList<>();
     private List<Integer> hopArray = new ArrayList<>();
+    private int localResultCounter=0;
 
     public App(Node bootstrapServer, Node currentNode) {
         thisNode = currentNode;
@@ -136,18 +137,50 @@ public class App {
 
             latencyArray.add((int) latancy);
             hopArray.add(result.getHops());
+            System.out.println("\nResult : "+ ++localResultCounter);
             echo(output);
 
         } else if (Command.ERROR.equals(command)) {
             System.out.println("Error");
             closeSocket();
 
-        } else {
+        } else if (Command.CLEAR.equals(command)) {
+            clearStats();
+        }else if (Command.QUERY.equals(command)) {
+            receivedMessages--;
+            initiateSearch(tokenizer.nextToken());
+        }else if (Command.STAT.equals(command)) {
+            receivedMessages --;
+            send(new Communicator(new Node(tokenizer.nextToken()), " " + Command.STATOK + " " + getStats().getEncodedStat()));
+            sentMessages--;
+        }else {
             unAnswerdMessages++;
         }
     }
+    Stat getStats(){
+        Stat stat = new Stat();
+        stat.setAnsweredMessages(receivedMessages-unAnswerdMessages);
+        stat.setSentMessages(sentMessages);
+        stat.setReceivedMessages(receivedMessages);
+        stat.setNodeDegree(neighbours.size());
+        if(latencyArray.size()>0){
+            double avg = latencyArray.stream().mapToLong(val -> val).average().getAsDouble();
+            stat.setLatencyMax(Collections.max(latencyArray));
+            stat.setLatencyMin(Collections.min(latencyArray));
+            stat.setLatencyAverage(avg);
+            stat.setLatencySD(getSD(latencyArray.toArray(), avg));
+
+            avg = hopArray.stream().mapToLong(val -> val).average().getAsDouble();
+            stat.setHopsMax(Collections.max(hopArray));
+            stat.setHopsMin(Collections.min(hopArray));
+            stat.setHopsAverage(avg);
+            stat.setHopsSD(getSD(hopArray.toArray(), avg));
+        }
+        return stat;
+    }
 
     synchronized void initiateSearch(String name) {
+        localResultCounter=0;
 
         Query query = new Query();
         query.setOrigin(thisNode);
@@ -295,7 +328,7 @@ public class App {
         }
     }
 
-    public void closeSocket() {
+    private void closeSocket() {
         if (socket != null) {
             if (!socket.isClosed()) {
                 socket.close();
@@ -312,28 +345,7 @@ public class App {
         movieHandler.getSelectedMovies().forEach(System.out::println);
     }
 
-    void getStats(){
-        int min=0,max=0;
-        double avg,sd=0;
 
-        String out = "";
-
-        out += "messages received \t: "+ receivedMessages +
-                "\nmessages sent \t: "+sentMessages+
-                "\nmessages answered \t: "+(receivedMessages-unAnswerdMessages)+
-                "\nNode degree \t: "+neighbours.size();
-        if(latencyArray.size()>0) {
-            max = Collections.max(latencyArray);
-            min = Collections.min(latencyArray);
-            avg = latencyArray.stream().mapToLong(val -> val).average().getAsDouble();
-            sd = getSD(latencyArray.toArray(), avg);
-            out +=    "\nlatency SD \t: "+sd+
-                    "\nlatency  max\t:"+max+
-                    "\nlatency  count \t:"+latencyArray.size()+
-                    "\nlatency  min\t:"+min;
-        }
-        echo(out);
-    }
 
     void clearStats(){
         receivedMessages=0;
@@ -342,7 +354,7 @@ public class App {
         latencyArray= new ArrayList<>();
     }
 
-    double getSD(Object[] latency, double mean){
+    private double getSD(Object[] latency, double mean){
     double variance = 0, sd =0;
     double [] temp =  new double[latency.length];
         for (int i = 0; i < latency.length; i++) {
@@ -356,7 +368,7 @@ public class App {
     }
 
     //simple function to echo data to terminal
-    public static void echo(String msg) {
+    private static void echo(String msg) {
         System.out.println(msg);
     }
 }
