@@ -11,6 +11,14 @@ public class AppLauncher extends Thread {
         int port1 = 50004;//rand.nextInt(1000) + 2000;
         Node bootsTrap = new Node("127.0.0.1", 55555);
         Node currentNode = new Node("127.0.0.1", port1, "user123");
+        if(args.length>=4){
+            bootsTrap.setIp(args[0]);
+            bootsTrap.setPort(Integer.parseInt(args[1]));
+            currentNode.setIp(args[2]);
+            currentNode.setPort(Integer.parseInt(args[3]));
+            if(args.length>4)
+                currentNode.setUsername(args[4]);
+        }
         final App app = new App(bootsTrap, currentNode);
         Thread thread1 = new Thread() {
             public void run() {

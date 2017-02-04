@@ -1,6 +1,7 @@
 import javax.sound.midi.Soundbank;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
 
 public class QueryHandler {
 
@@ -46,19 +48,22 @@ public class QueryHandler {
         int qhport = 54000;
         String fileName = "Queries.txt";
         boolean stay = true;
+        int counttt =0;
         try {
             Scanner scanner = new Scanner(new File(fileName));
             while (scanner.hasNextLine()) {
                 queryList.add(scanner.nextLine());
+                counttt++;
+                if(counttt>5)
+                    break;
             }
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
         System.out.println(queryList);
         try{
-            int portNumber = 11111;
-            socket = new DatagramSocket(portNumber);
-            System.out.println("Query Handler Activated on port " + portNumber);
+            socket = new DatagramSocket(qhport);
+            System.out.println("Query Handler Activated on port " + qhport);
             int option = 0;
             String reply = null;
             int query_position =0;
@@ -103,7 +108,7 @@ public class QueryHandler {
                         System.out.println("Current node updated: "+ node_position);
                         break;
                     case 4:
-                        reply = "0000 STAT "+new Node(qhip,qhport).getEncodedNode();
+                        reply = "0000 STAT ";
                         String s = null;
                         for(int i=0;i<len;i++) {
                             DatagramPacket statReply = new DatagramPacket(reply.getBytes(), reply.getBytes().length, InetAddress.getByName(nodeList.get(i).getIp()), nodeList.get(i).getPort());
@@ -115,6 +120,7 @@ public class QueryHandler {
 
                             byte[] data = incoming.getData();
                             s = new String(data, 0, incoming.getLength());
+                            System.out.println(s);
                             StringTokenizer tokenizer = new StringTokenizer(s," ");
                             int count = Integer.parseInt(tokenizer.nextToken());
                             String command = tokenizer.nextToken();
@@ -126,6 +132,7 @@ public class QueryHandler {
 
                             //// TODO: 2/5/17 Implement of stat calculating after they recieved
                         }
+
                         break;
                     case 5:
                         System.exit(0);
