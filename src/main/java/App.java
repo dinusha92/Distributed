@@ -11,6 +11,9 @@ public class App {
     private final List<Node> neighbours = new ArrayList<>();
     private final List<Query> queryList = new ArrayList<>();
     private MovieHandler movieHandler = MovieHandler.getInstance("movies.txt");
+    private int receivedMessages, sentMessages,unAnswerdMessages;
+    private List<Integer> latencyArray = new ArrayList<>();
+    private List<Integer> hopArray = new ArrayList<>();
 
     public App(Node bootstrapServer, Node currentNode) {
         thisNode = currentNode;
@@ -48,6 +51,7 @@ public class App {
     //will be invoked when a response is received
     private void onResponseReceived(String messege) {
 
+        receivedMessages++;
         StringTokenizer tokenizer = new StringTokenizer(messege, " ");
         String length = tokenizer.nextToken();
         String command = tokenizer.nextToken();
@@ -126,8 +130,11 @@ public class App {
             Result result = new Result(tokenizer.nextToken());
             int moviesCount = result.getMovies().size();
 
+            long latancy = (System.currentTimeMillis() - result.getTimestamp());
             String output = String.format("\nNumber of movies: %d\nMovies: %s\nHops: %d\nSender %s:%d\nLatency: %s ms",
-                    moviesCount, result.getMovies().toString(), result.getHops(), result.getOwner().getIp(), result.getOwner().getPort(), (System.currentTimeMillis() - result.getTimestamp()));
+                    moviesCount, result.getMovies().toString(), result.getHops(), result.getOwner().getIp(), result.getOwner().getPort(), latancy);
+
+            latencyArray.add((int) latancy);
             echo(output);
 
         } else if (Command.ERROR.equals(command)) {
@@ -135,6 +142,7 @@ public class App {
             closeSocket();
 
         } else {
+            unAnswerdMessages++;
         }
     }
 
@@ -170,6 +178,7 @@ public class App {
     synchronized private void search(Query query) {
 
         if (queryList.contains(query)) {
+            unAnswerdMessages++;
             return;
         } else {
             queryList.add(query);
@@ -279,6 +288,7 @@ public class App {
             DatagramPacket packet = new DatagramPacket(request.getMessage().getBytes(), request.getMessage().getBytes().length,
                     InetAddress.getByName(request.getIp()), request.getPort());
             socket.send(packet);
+            sentMessages++;
         } catch (IOException e) {
             System.out.println(e);
         }
@@ -299,6 +309,49 @@ public class App {
 
     void echoMovies() {
         movieHandler.getSelectedMovies().forEach(System.out::println);
+    }
+
+    void getStats(){
+        int min=0,max=0;
+        double avg,sd=0;
+
+        String out = "";
+
+        out += "messages received \t: "+ receivedMessages +
+                "\nmessages sent \t: "+sentMessages+
+                "\nmessages answered \t: "+(receivedMessages-unAnswerdMessages)+
+                "\nNode degree \t: "+neighbours.size();
+        if(latencyArray.size()>0) {
+            max = Collections.max(latencyArray);
+            min = Collections.min(latencyArray);
+            avg = latencyArray.stream().mapToLong(val -> val).average().getAsDouble();
+            sd = getSD(latencyArray.toArray(), avg);
+            out +=    "\nlatency SD \t: "+sd+
+                    "\nlatency  max\t:"+max+
+                    "\nlatency  count \t:"+latencyArray.size()+
+                    "\nlatency  min\t:"+min;
+        }
+        echo(out);
+    }
+
+    void clearStats(){
+        receivedMessages=0;
+        sentMessages= 0;
+        unAnswerdMessages = 0;
+        latencyArray= new ArrayList<>();
+    }
+
+    double getSD(Object[] latency, double mean){
+    double variance = 0, sd =0;
+    double [] temp =  new double[latency.length];
+        for (int i = 0; i < latency.length; i++) {
+            temp[i] = (double)(Integer)latency[i] - mean;
+            temp[i] = Math.pow(temp[i], 2.0); //to get the (x-average)……2
+            variance += temp[i];
+        }
+        variance = variance / (latency.length-1); // sample variance
+        sd = Math.sqrt(variance);
+        return sd;
     }
 
     //simple function to echo data to terminal

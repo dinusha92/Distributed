@@ -37,6 +37,8 @@ public class AppLauncher extends Thread {
                     System.out.println("2. Leave the network");
                     System.out.println("3. List movies");
                     System.out.println("4. List peers");
+                    System.out.println("5. Get status");
+                    System.out.println("6. Clear status");
                     System.out.println("---------------------");
                     try {
                         opt = Integer.parseInt(scan.nextLine().trim());
@@ -57,6 +59,12 @@ public class AppLauncher extends Thread {
                             break;
                         case 4:
                             app.echoPeers();
+                            break;
+                        case 5:
+                            app.getStats();
+                            break;
+                        case 6:
+                            app.clearStats();
                             break;
                         default:
                             System.out.println("Input error");

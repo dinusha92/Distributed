@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,6 +15,8 @@ class Result implements Serializable {
         String[] str = encodedResult.split(sep);
         owner = new Node(str[0]);
         movies = Arrays.asList(str[1].split(","));
+        if(movies.get(0).equals(""))
+            movies = new ArrayList<>();
         hops = Integer.parseInt(str[2]);
         timestamp = Long.parseLong(str[3]);
     }
