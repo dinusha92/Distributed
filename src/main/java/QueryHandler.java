@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class QueryHandler {
 
@@ -16,17 +17,33 @@ public class QueryHandler {
         List<String> ipList = new ArrayList<>();
         List<Integer> portList = new ArrayList<Integer>();
         List<Node> nodeList = new ArrayList<>();
-        nodeList.add(new Node("127.0.0.1",34343));
-        nodeList.add(new Node("127.0.0.1",34343));
-        nodeList.add(new Node("127.0.0.1",34343));
-        nodeList.add(new Node("127.0.0.1",34343));
-        nodeList.add(new Node("127.0.0.1",34343));
-        nodeList.add(new Node("127.0.0.1",34343));
-        nodeList.add(new Node("127.0.0.1",34343));
-        nodeList.add(new Node("127.0.0.1",34343));
-        nodeList.add(new Node("127.0.0.1",34343));
-        nodeList.add(new Node("127.0.0.1",34343));
+        List<Integer> recieved_stat = new ArrayList<>();
+        List<Integer> answered_stat = new ArrayList<>();
+        List<Integer> sent_stat = new ArrayList<>();
 
+        nodeList.add(new Node("127.0.0.1",50000));
+        nodeList.add(new Node("127.0.0.1",50001));
+        nodeList.add(new Node("127.0.0.1",50002));
+        nodeList.add(new Node("127.0.0.1",50003));
+        nodeList.add(new Node("127.0.0.1",50004));
+//        nodeList.add(new Node("127.0.0.1",50005));
+//        nodeList.add(new Node("127.0.0.1",50006));
+//        nodeList.add(new Node("127.0.0.1",50007));
+//        nodeList.add(new Node("127.0.0.1",50008));
+//        nodeList.add(new Node("127.0.0.1",50009));
+
+        List<Integer> node_degree = new ArrayList<>();
+
+        int hop_min;
+        int hop_max;
+        int hop_sd;
+        int hop_average;
+        int latency_min;
+        int latenct_max;
+        int latency_sd;
+        int latency_average;
+        String qhip="127.0.0.1";
+        int qhport = 54000;
         String fileName = "Queries.txt";
         boolean stay = true;
         try {
@@ -66,11 +83,14 @@ public class QueryHandler {
                             DatagramPacket dpReply = new DatagramPacket(reply.getBytes(), reply.getBytes().length, InetAddress.getByName(nodeList.get(i).getIp()), nodeList.get(i).getPort());
                             socket.send(dpReply);
                         }
+                        recieved_stat = new ArrayList<>();
+                        sent_stat = new ArrayList<>();;
+                        answered_stat = new ArrayList<>();
                         break;
                     case 9:
                         String query_search = queryList.get(query_position);
                         query_position++;
-                        reply = "0000 QUERY "+ query_search;
+                        reply = "0000 QUERY "+ query_search.trim().replace(" ", "_");
                         DatagramPacket dpReply = new DatagramPacket(reply.getBytes(), reply.getBytes().length, InetAddress.getByName(nodeList.get(node_position).getIp()), nodeList.get(node_position).getPort());
                         socket.send(dpReply);
                         break;
@@ -83,7 +103,7 @@ public class QueryHandler {
                         System.out.println("Current node updated: "+ node_position);
                         break;
                     case 4:
-                        reply = "0000 STAT";
+                        reply = "0000 STAT "+new Node(qhip,qhport).getEncodedNode();
                         String s = null;
                         for(int i=0;i<len;i++) {
                             DatagramPacket statReply = new DatagramPacket(reply.getBytes(), reply.getBytes().length, InetAddress.getByName(nodeList.get(i).getIp()), nodeList.get(i).getPort());
@@ -95,6 +115,14 @@ public class QueryHandler {
 
                             byte[] data = incoming.getData();
                             s = new String(data, 0, incoming.getLength());
+                            StringTokenizer tokenizer = new StringTokenizer(s," ");
+                            int count = Integer.parseInt(tokenizer.nextToken());
+                            String command = tokenizer.nextToken();
+                            Stat stat = new Stat(tokenizer.nextToken());
+                            recieved_stat.add(stat.getReceivedMessages());
+                            sent_stat.add(stat.getSentMessages());
+                            answered_stat.add(stat.getAnsweredMessages());
+                            node_degree.add(stat.getNodeDegree());
 
                             //// TODO: 2/5/17 Implement of stat calculating after they recieved
                         }
@@ -111,5 +139,17 @@ public class QueryHandler {
 
         }
 
+    }
+    private double getSD(Object[] latency, double mean){
+        double variance = 0, sd =0;
+        double [] temp =  new double[latency.length];
+        for (int i = 0; i < latency.length; i++) {
+            temp[i] = (double)(Integer)latency[i] - mean;
+            temp[i] = Math.pow(temp[i], 2.0); //to get the (x-average)……2
+            variance += temp[i];
+        }
+        variance = variance / (latency.length-1); // sample variance
+        sd = Math.sqrt(variance);
+        return sd;
     }
 }
