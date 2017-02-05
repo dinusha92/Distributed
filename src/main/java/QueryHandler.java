@@ -39,12 +39,12 @@ public class QueryHandler {
 
         int hop_min=0;
         int hop_max=0;
-        int hop_sd=0;
-        int hop_average=0;
-        int latency_min=0;
-        int latency_max=0;
-        int latency_sd=0;
-        int latency_average=0;
+        double hop_sd=0;
+        double hop_average=0;
+        double latency_min=0;
+        double latency_max=0;
+        double latency_sd=0;
+        double latency_average=0;
         String qhip="127.0.0.1";
         int qhport = 54000;
         String fileName = "Queries.txt";
@@ -167,7 +167,8 @@ public class QueryHandler {
                                 if(hop_max>stat.getLatencyMax()){
                                     latency_max = stat.getLatencyMax();
                                 }
-
+                                hop_average = (hop_average + stat.getHopsAverage())/2;
+                                latency_average = (latency_average + stat.getLatencyAverage())/2;
 
                             }
                             System.out.println(stat.toString());
