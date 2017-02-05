@@ -364,7 +364,7 @@ public class App {
     double [] temp =  new double[latency.length];
         for (int i = 0; i < latency.length; i++) {
             temp[i] = (double)(Integer)latency[i] - mean;
-            temp[i] = Math.pow(temp[i], 2.0); //to get the (x-average)……2
+            temp[i] = Math.pow(temp[i], 2); //to get the (x-average)……2
             variance += temp[i];
         }
         variance = variance / (latency.length-1); // sample variance
