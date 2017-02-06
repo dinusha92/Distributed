@@ -132,13 +132,15 @@ public class App {
             Result result = new Result(tokenizer.nextToken());
             int moviesCount = result.getMovies().size();
 
-            long latancy = (System.currentTimeMillis() - result.getTimestamp());
-            String output = String.format("Number of movies: %d\nMovies: %s\nHops: %d\nSender %s:%d\nLatency: %s ms",
-                    moviesCount, result.getMovies().toString(), result.getHops(), result.getOwner().getIp(), result.getOwner().getPort(), latancy);
+            long latency = (System.currentTimeMillis() - result.getTimestamp());
 
-            latencyArray.add((int) latancy);
-            hopArray.add(result.getHops());
+            if(result.getHops()>0) {
+                latencyArray.add((int) latency);
+                hopArray.add(result.getHops());
+            }
             System.out.println("\n**Result : "+ ++localResultCounter +"  [ Query = "+localQuerry+"]" );
+            String output = String.format("Number of movies: %d\nMovies: %s\nHops: %d\nSender %s:%d\nLatency: %s ms",
+                    moviesCount, result.getMovies().toString(), result.getHops(), result.getOwner().getIp(), result.getOwner().getPort(), latency);
             echo(output);
 
         } else if (Command.ERROR.equals(command)) {
