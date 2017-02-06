@@ -14,6 +14,8 @@ public class Stat {
     private int hopsMax=0;
     private double hopsSD=0;
     private double hopsAverage=0;
+    private int numberOfHope=0;
+    private int numberOfLatencies =0;
     private String sep = "#";
 
     public Stat(){
@@ -29,17 +31,30 @@ public class Stat {
         latencyMax = Integer.parseInt(str[4]);
         latencySD = Double.parseDouble(str[5]);
         latencyAverage = Double.parseDouble(str[6]);
-        hopsMin = Integer.parseInt(str[7]);
-        hopsMax = Integer.parseInt(str[8]);
-        hopsSD = Double.parseDouble(str[9]);
-        hopsAverage = Double.parseDouble(str[10]);
-        nodeDegree = Integer.parseInt(str[11]);
+        numberOfLatencies = Integer.parseInt(str[7]);
+        hopsMin = Integer.parseInt(str[8]);
+        hopsMax = Integer.parseInt(str[9]);
+        hopsSD = Double.parseDouble(str[10]);
+        hopsAverage = Double.parseDouble(str[11]);
+        nodeDegree = Integer.parseInt(str[12]);
+        numberOfHope = Integer.parseInt(str[13]);
     }
 
     public String getEncodedStat(){
-        return receivedMessages+sep+sentMessages+sep+answeredMessages+sep
-                +latencyMin+sep+latencyMax+sep+latencySD+sep+latencyAverage+sep
-                +hopsMin+sep+hopsMax+sep+hopsSD+sep+hopsAverage+sep+nodeDegree;
+        return receivedMessages+sep+
+                sentMessages+sep+
+                answeredMessages+sep
+                +latencyMin+sep+
+                latencyMax+sep+
+                latencySD+sep+
+                latencyAverage+sep+
+                numberOfLatencies+sep
+                +hopsMin+sep+
+                hopsMax+sep+
+                hopsSD+sep+
+                hopsAverage+sep+
+                nodeDegree+sep+
+                numberOfHope;
     }
 
     public int getReceivedMessages() {
@@ -139,10 +154,12 @@ public class Stat {
         out+="Node degree\t:"+nodeDegree+"\n\n";
         out+="Latency Min\t:"+latencyMin+"\n";
         out+="Latency Max\t:"+latencyMax+"\n";
+        out+="No.of Latencies\t:"+numberOfLatencies+"\n";
         out+="Latency Average\t:"+latencyAverage+"\n";
         out+="Latency SD\t:"+latencySD+"\n\n";
         out+="Hops Min\t:"+hopsMin+"\n";
         out+="Hops Max\t:"+hopsMax+"\n";
+        out+="No. of hops\t:"+numberOfHope+"\n";
         out+="Hops Average\t:"+hopsAverage+"\n";
         out+="Hops SD\t:"+hopsSD+"\n";
         return out;
@@ -154,5 +171,21 @@ public class Stat {
 
     public void setNodeDegree(int nodeDegree) {
         this.nodeDegree = nodeDegree;
+    }
+
+    public int getNumberOfHope() {
+        return numberOfHope;
+    }
+
+    public void setNumberOfHope(int numberOfHope) {
+        this.numberOfHope = numberOfHope;
+    }
+
+    public int getNumberOfLatencies() {
+        return numberOfLatencies;
+    }
+
+    public void setNumberOfLatencies(int numberOfLatencies) {
+        this.numberOfLatencies = numberOfLatencies;
     }
 }
