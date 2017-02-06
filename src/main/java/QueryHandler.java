@@ -115,11 +115,19 @@ public class QueryHandler {
                 switch (option){
                     case 1:
                         reply = "0010 CLEAR";
+                        String answer=null;
+                        System.out.println("y/n??");
+                        answer =(scan.nextLine().trim());
+                        if(!answer.equals("y")){
+                            System.out.println("Not cleared");
+                            break;
+                        }
                         query_position = 0;
                         for(int i=0;i<len;i++) {
                             DatagramPacket dpReply = new DatagramPacket(reply.getBytes(), reply.getBytes().length, InetAddress.getByName(nodeList.get(i).getIp()), nodeList.get(i).getPort());
                             socket.send(dpReply);
                         }
+                        System.out.println("cleared");
                         break;
                     case 9:
                         String query_search = queryList.get(query_position);
@@ -246,6 +254,12 @@ public class QueryHandler {
                             leaving = Integer.parseInt(scan.nextLine().trim());
                         }catch (NumberFormatException e){
                             leaving=-1;
+                        }
+                        System.out.println("y/n??");
+                        answer =(scan.nextLine().trim());
+                        if(!answer.equals("y")){
+                            System.out.println("Not left");
+                            break;
                         }
                         try{
                             System.out.println("removed node"+nodeList.remove(leaving));
