@@ -169,7 +169,7 @@ public class QueryHandler {
                                 if(hop_max<stat.getLatencyMax()){
                                     latency_max = stat.getLatencyMax();
                                 }
-
+                                statList.add(stat);
 
                             }
                             System.out.println(stat.toString());
@@ -197,7 +197,16 @@ public class QueryHandler {
                         sd_sent = getSD(sent_stat.toArray(), calculateAverage(sent_stat));
                         sd_ndgree = getSD(node_degree.toArray(), avg_ndgree);
 
+                        CombinedStdDevGeneration stdgen = new CombinedStdDevGeneration(statList);
+                        hop_average = stdgen.getSampleMeanOfHops();
+                        hop_sd = stdgen.calculateStdDevOfHops();
+                        latency_average = stdgen.getSampleMeanOfLatencies();
+                        latency_sd = stdgen.calculateStdDevOfLatencies();
 
+                        System.out.println("hop_average" + hop_average);
+                        System.out.println("hop sd" + hop_sd);
+                        System.out.println("latency average" + latency_average);
+                        System.out.println("latancy std"+latency_sd);
 
                         break;
                     case 5:
@@ -206,10 +215,10 @@ public class QueryHandler {
 
                         FileWriter fw = new FileWriter(file);
                         fw.write("        recieved    answered    sent    node degree     latency     hops");
-                        fw.write("min    "+min_rec+"   "+min_ans+"  "+min_sent+"  "+min_ndgree+"  "+latency_min+hop_min);
-                        fw.write("max    "+max_rec+"   "+max_ans+"  "+max_sent+"  "+max_ndgree+"  "+latency_max+hop_max);
-                        fw.write("average    "+avg_rec+"   "+avg_ans+"  "+avg_sent+"  "+avg_ndgree+"  "+latency_average+hop_average);
-                        fw.write("sd   "+sd_rec+"   "+sd_ans+"  "+sd_sent+"  "+sd_ndgree+"  "+latency_sd+hop_sd);
+                        fw.write("min    "+min_rec+"   "+min_ans+"  "+min_sent+"  "+min_ndgree+"  "+latency_min+" "+hop_min);
+                        fw.write("max    "+max_rec+"   "+max_ans+"  "+max_sent+"  "+max_ndgree+"  "+latency_max+" "+hop_max);
+                        fw.write("average    "+avg_rec+"   "+avg_ans+"  "+avg_sent+"  "+avg_ndgree+"  "+latency_average+" "+hop_average);
+                        fw.write("sd   "+sd_rec+"   "+sd_ans+"  "+sd_sent+"  "+sd_ndgree+"  "+latency_sd+" "+hop_sd);
                         fw.flush();
                         fw.close();
                         break;
