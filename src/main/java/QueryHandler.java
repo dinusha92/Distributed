@@ -19,7 +19,7 @@ public class QueryHandler {
         List<Integer> recieved_stat = new ArrayList<>();
         List<Integer> answered_stat = new ArrayList<>();
         List<Integer> sent_stat = new ArrayList<>();
-        List<Integer> hops = new ArrayList<>();
+        List<Integer> hops_count = new ArrayList<>();
         List<Double> latency = new ArrayList<>();
           nodeList.add(new Node("128.199.142.217",50000));
           nodeList.add(new Node("128.199.151.76",50001));
@@ -37,11 +37,12 @@ public class QueryHandler {
 
         List<Integer> node_degree = new ArrayList<>();
 
-        int hop_min=0;
+        int hop_min=99999;
         int hop_max=0;
+        int hop_count=0;
         double hop_sd=0;
         double hop_average=0;
-        double latency_min=0;
+        double latency_min=999999;
         double latency_max=0;
         double latency_sd=0;
         double latency_average=0;
@@ -49,6 +50,7 @@ public class QueryHandler {
         int qhport = 54000;
         String fileName = "Queries.txt";
         boolean stay = true;
+        List<Stat> statList = new ArrayList<>();
         int counttt =0;
         try {
             Scanner scanner = new Scanner(new File(fileName));
@@ -158,17 +160,16 @@ public class QueryHandler {
                                 if(hop_min>stat.getHopsMin()){
                                     hop_min = stat.getHopsMin();
                                 }
-                                if(hop_max>stat.getHopsMax()){
+                                if(hop_max<stat.getHopsMax()){
                                     hop_max = stat.getHopsMax();
                                 }
                                 if(latency_min>stat.getLatencyMin()){
                                     latency_min = stat.getLatencyMin();
                                 }
-                                if(hop_max>stat.getLatencyMax()){
+                                if(hop_max<stat.getLatencyMax()){
                                     latency_max = stat.getLatencyMax();
                                 }
-                                hop_average = (hop_average + stat.getHopsAverage())/2;
-                                latency_average = (latency_average + stat.getLatencyAverage())/2;
+
 
                             }
                             System.out.println(stat.toString());
