@@ -1,12 +1,13 @@
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by vithulan on 2/5/17.
  */
 public class CombinedStdDevGeneration {
-    private ArrayList<Stat> statList;
+    private List<Stat> statList;
 
-    public CombinedStdDevGeneration(ArrayList<Stat> stats) {
+    public CombinedStdDevGeneration(List<Stat> stats) {
         this.statList=stats;
     }
 
