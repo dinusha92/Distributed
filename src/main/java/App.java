@@ -139,10 +139,10 @@ public class App {
 
             long latency = (System.currentTimeMillis() - result.getTimestamp());
 
-            if(result.getHops()>0) {
+
                 latencyArray.add((int) latency);
                 hopArray.add(result.getHops());
-            }
+
             System.out.println("\nq= " +queryPointer+" **Result : "+ ++localResultCounter +"  [ Query = "+localQuerry+"]" );
             String output = String.format("Number of movies: %d\nMovies: %s\nHops: %d\nSender %s:%d\nLatency: %s ms",
                     moviesCount, result.getMovies().toString(), result.getHops(), result.getOwner().getIp(), result.getOwner().getPort(), latency);
@@ -184,6 +184,11 @@ public class App {
             send(new Communicator(sender, " " + Command.STATOK + " " + getStats().getEncodedStat()));
             System.out.println("Stat sent");
             sentMessages--;
+        }else if (Command.STAT.equals(command)) {
+            receivedMessages --;
+            send(new Communicator(sender, " " + Command.STATOK + " " + getStats().getEncodedStat()));
+            System.out.println("Stat sent");
+            sentMessages--;
         }else {
             unAnsweredMessages++;
         }
@@ -216,12 +221,25 @@ public class App {
             stat.setLatencySD(getSD(latencyArray.toArray(), avg));
             stat.setNumberOfLatencies(latencyArray.size());
 
+            String latencies="";
+            for (int latency: latencyArray){
+                latencies+=latency+",";
+            }
+            stat.setLatencies(latencies);
+
+
             avg = hopArray.stream().mapToLong(val -> val).average().getAsDouble();
             stat.setHopsMax(Collections.max(hopArray));
             stat.setHopsMin(Collections.min(hopArray));
             stat.setHopsAverage(avg);
             stat.setHopsSD(getSD(hopArray.toArray(), avg));
             stat.setNumberOfHope(hopArray.size());
+            String hops="";
+            for (int hop: hopArray){
+                hops+=hop+",";
+            }
+            stat.setHops(hops);
+
         }
         return stat;
     }

@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class AppLauncher extends Thread {
     public static void main(String[] args) {
         final Random rand = new Random();
-        int port1 = 50004;//rand.nextInt(1000) + 2000;
+        int port1 = 50009;//rand.nextInt(1000) + 2000;
         Node bootsTrap = new Node("127.0.0.1", 55555);
         Node currentNode = new Node("127.0.0.1", port1, "user123");
         if(args.length>=4){

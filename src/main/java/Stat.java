@@ -17,6 +17,8 @@ public class Stat {
     private int numberOfHope=0;
     private int numberOfLatencies =0;
     private String sep = "#";
+    private String hops=",";
+    private String latencies =",";
 
     public Stat(){
 
@@ -38,6 +40,8 @@ public class Stat {
         hopsAverage = Double.parseDouble(str[11]);
         nodeDegree = Integer.parseInt(str[12]);
         numberOfHope = Integer.parseInt(str[13]);
+        hops=str[14];
+        latencies=str[15];
     }
 
     public String getEncodedStat(){
@@ -54,7 +58,9 @@ public class Stat {
                 hopsSD+sep+
                 hopsAverage+sep+
                 nodeDegree+sep+
-                numberOfHope;
+                numberOfHope+sep+
+                hops+sep+
+                latencies;
     }
 
     public int getReceivedMessages() {
@@ -187,5 +193,21 @@ public class Stat {
 
     public void setNumberOfLatencies(int numberOfLatencies) {
         this.numberOfLatencies = numberOfLatencies;
+    }
+
+    public String getHops() {
+        return hops;
+    }
+
+    public void setHops(String hops) {
+        this.hops = hops;
+    }
+
+    public String getLatencies() {
+        return latencies;
+    }
+
+    public void setLatencies(String latencies) {
+        this.latencies = latencies;
     }
 }
