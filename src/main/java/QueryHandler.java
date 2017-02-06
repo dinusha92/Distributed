@@ -24,16 +24,16 @@ public class QueryHandler {
 //          nodeList.add(new Node("128.199.142.217",50000));
 //          nodeList.add(new Node("128.199.151.76",50001));
 
-        nodeList.add(new Node("127.0.0.1",50000));
-        nodeList.add(new Node("127.0.0.1",50001));
-        nodeList.add(new Node("127.0.0.1",50002));
-        nodeList.add(new Node("127.0.0.1",50003));
-        nodeList.add(new Node("127.0.0.1",50004));
-        nodeList.add(new Node("127.0.0.1",50005));
-        nodeList.add(new Node("127.0.0.1",50006));
-        nodeList.add(new Node("127.0.0.1",50007));
-        nodeList.add(new Node("127.0.0.1",50008));
-        nodeList.add(new Node("127.0.0.1",50009));
+        nodeList.add(new Node("128.199.142.217",50001));
+        nodeList.add(new Node("128.199.151.76",50002));
+        nodeList.add(new Node("128.199.160.17",50003));
+        nodeList.add(new Node("128.199.161.29",50004));
+        nodeList.add(new Node("188.166.226.16",50005));
+        nodeList.add(new Node("188.166.223.190",50006));
+        nodeList.add(new Node("188.166.217.130",50007));
+        nodeList.add(new Node("188.166.211.138",50008));
+        nodeList.add(new Node("188.166.215.16",50009));
+        nodeList.add(new Node("188.166.215.150",50010));
 
         List<Integer> node_degree = new ArrayList<>();
 
@@ -57,8 +57,9 @@ public class QueryHandler {
             while (scanner.hasNextLine()) {
                 queryList.add(scanner.nextLine());
                 counttt++;
-                if(counttt>5)
-                    break;
+//                if(counttt>2){
+//                    break;
+//                }
             }
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
@@ -104,7 +105,7 @@ public class QueryHandler {
                 System.out.println("5.Final Stat Results after 250 queries");
                 System.out.println("6.Remove node from");
                 System.out.println("7.Exit");
-                System.out.println("CURRENT QUERY POSITION: "+ query_position);
+
                 Scanner scan = new Scanner(System.in);
                 int len = nodeList.size();
                 try {
@@ -130,12 +131,13 @@ public class QueryHandler {
                         System.out.println("cleared");
                         break;
                     case 9:
-                        String query_search = queryList.get(query_position);
-                        query_position++;
+                        //query_position++;
                         if(query_position<queryList.size()) {
-                            reply = "0000 QUERY " + query_search.trim().replace(" ", "_");
+                            String query_search = queryList.get(query_position++);
+                            reply = "0000 QUERY " +nodeList.size();
                             DatagramPacket dpReply = new DatagramPacket(reply.getBytes(), reply.getBytes().length, InetAddress.getByName(nodeList.get(node_position).getIp()), nodeList.get(node_position).getPort());
                             socket.send(dpReply);
+                            System.out.println("CURRENT QUERY POSITION: "+ (query_position)+ " query: "+queryList.get(query_position-1));
                         }else{
                             System.out.println("reached to the limit");
                         }
@@ -279,7 +281,7 @@ public class QueryHandler {
             }
             socket.close();
         }catch (Exception e){
-
+            e.printStackTrace();
         }
 
     }
