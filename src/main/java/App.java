@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -16,6 +18,9 @@ public class App {
     private List<Integer> hopArray = new ArrayList<>();
     private int localResultCounter=0;
     private String localQuerry="";
+    private List<String> LocalQueries=new ArrayList<>();
+    private int queryPointer =0;
+    private  int noOfNodesInTheNetwork =0;
 
     public App(Node bootstrapServer, Node currentNode) {
         thisNode = currentNode;
@@ -138,10 +143,16 @@ public class App {
                 latencyArray.add((int) latency);
                 hopArray.add(result.getHops());
             }
-            System.out.println("\n**Result : "+ ++localResultCounter +"  [ Query = "+localQuerry+"]" );
+            System.out.println("\nq= " +queryPointer+" **Result : "+ ++localResultCounter +"  [ Query = "+localQuerry+"]" );
             String output = String.format("Number of movies: %d\nMovies: %s\nHops: %d\nSender %s:%d\nLatency: %s ms",
                     moviesCount, result.getMovies().toString(), result.getHops(), result.getOwner().getIp(), result.getOwner().getPort(), latency);
             echo(output);
+
+            if(localResultCounter==noOfNodesInTheNetwork&&LocalQueries.size()>queryPointer){
+                startQurey(LocalQueries.get(queryPointer++));
+            }else if(LocalQueries.size()<=queryPointer){
+                System.out.println("****Searching completed!****");
+            }
 
         } else if (Command.ERROR.equals(command)) {
             System.out.println("Error");
@@ -152,7 +163,22 @@ public class App {
             clearStats();
         }else if (Command.QUERY.equals(command)) {
             receivedMessages--;
-            initiateSearch(tokenizer.nextToken());
+            LocalQueries=new ArrayList<>();
+            noOfNodesInTheNetwork = Integer.parseInt(tokenizer.nextToken());
+            queryPointer =0;
+
+            String fileName = "Queries.txt";
+            try {
+                Scanner scanner = new Scanner(new File(fileName));
+                while (scanner.hasNextLine()) {
+                    LocalQueries.add(scanner.nextLine().trim().toLowerCase().replace(" ","_"));
+                }
+            } catch (FileNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
+            //initiateSearch(tokenizer.nextToken());
+            if(LocalQueries.size()>0)
+            startQurey(LocalQueries.get(queryPointer++));
         }else if (Command.STAT.equals(command)) {
             receivedMessages --;
             send(new Communicator(sender, " " + Command.STATOK + " " + getStats().getEncodedStat()));
@@ -161,6 +187,20 @@ public class App {
         }else {
             unAnsweredMessages++;
         }
+    }
+
+    void startQurey(String qry){
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                    initiateSearch(qry);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
     Stat getStats(){
         Stat stat = new Stat();
@@ -242,8 +282,8 @@ public class App {
 
         neighbours.stream().filter(peer -> !peer.equals(sender)).forEach(peer -> {
             sendSearch(peer, query);
-
         });
+        System.out.println("Result sent to "+query.getOrigin());
         sendResults(query.getOrigin(), result);
     }
 
