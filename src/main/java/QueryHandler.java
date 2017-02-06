@@ -214,11 +214,11 @@ public class QueryHandler {
                         fileNumber++;
 
                         FileWriter fw = new FileWriter(file);
-                        fw.write("        recieved    answered    sent    node degree     latency     hops");
-                        fw.write("min    "+min_rec+"   "+min_ans+"  "+min_sent+"  "+min_ndgree+"  "+latency_min+" "+hop_min);
-                        fw.write("max    "+max_rec+"   "+max_ans+"  "+max_sent+"  "+max_ndgree+"  "+latency_max+" "+hop_max);
-                        fw.write("average    "+avg_rec+"   "+avg_ans+"  "+avg_sent+"  "+avg_ndgree+"  "+latency_average+" "+hop_average);
-                        fw.write("sd   "+sd_rec+"   "+sd_ans+"  "+sd_sent+"  "+sd_ndgree+"  "+latency_sd+" "+hop_sd);
+                        fw.write("recieved,answered,sent,node degree,latency,hops");
+                        fw.write(min_rec+","+min_ans+","+min_sent+","+min_ndgree+","+latency_min+","+hop_min+"\n");
+                        fw.write(max_rec+","+max_ans+","+max_sent+","+max_ndgree+","+latency_max+","+hop_max+"\n");
+                        fw.write(avg_rec+","+avg_ans+","+avg_sent+","+avg_ndgree+","+latency_average+","+hop_average+"\n");
+                        fw.write(sd_rec+","+sd_ans+","+sd_sent+","+sd_ndgree+","+latency_sd+","+hop_sd);
                         fw.flush();
                         fw.close();
                         break;
