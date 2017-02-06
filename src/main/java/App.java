@@ -133,12 +133,12 @@ public class App {
             int moviesCount = result.getMovies().size();
 
             long latancy = (System.currentTimeMillis() - result.getTimestamp());
-            String output = String.format("\nNumber of movies: %d\nMovies: %s\nHops: %d\nSender %s:%d\nLatency: %s ms",
+            String output = String.format("Number of movies: %d\nMovies: %s\nHops: %d\nSender %s:%d\nLatency: %s ms",
                     moviesCount, result.getMovies().toString(), result.getHops(), result.getOwner().getIp(), result.getOwner().getPort(), latancy);
 
             latencyArray.add((int) latancy);
             hopArray.add(result.getHops());
-            System.out.println("\nResult ["+localQuerry+"] : "+ ++localResultCounter);
+            System.out.println("\n**Result : "+ ++localResultCounter +"  [ Query = "+localQuerry+"]" );
             echo(output);
 
         } else if (Command.ERROR.equals(command)) {
@@ -172,12 +172,14 @@ public class App {
             stat.setLatencyMin(Collections.min(latencyArray));
             stat.setLatencyAverage(avg);
             stat.setLatencySD(getSD(latencyArray.toArray(), avg));
+            stat.setNumberOfLatencies(latencyArray.size());
 
             avg = hopArray.stream().mapToLong(val -> val).average().getAsDouble();
             stat.setHopsMax(Collections.max(hopArray));
             stat.setHopsMin(Collections.min(hopArray));
             stat.setHopsAverage(avg);
             stat.setHopsSD(getSD(hopArray.toArray(), avg));
+            stat.setNumberOfHope(hopArray.size());
         }
         return stat;
     }
