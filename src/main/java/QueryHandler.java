@@ -21,19 +21,19 @@ public class QueryHandler {
         List<Integer> sent_stat = new ArrayList<>();
         List<Integer> hops_count = new ArrayList<>();
         List<Double> latency = new ArrayList<>();
-          nodeList.add(new Node("128.199.142.217",50000));
-          nodeList.add(new Node("128.199.151.76",50001));
+//          nodeList.add(new Node("128.199.142.217",50000));
+//          nodeList.add(new Node("128.199.151.76",50001));
 
-//        nodeList.add(new Node("127.0.0.1",50000));
-//        nodeList.add(new Node("127.0.0.1",50001));
-//        nodeList.add(new Node("127.0.0.1",50002));
-//        nodeList.add(new Node("127.0.0.1",50003));
-//        nodeList.add(new Node("127.0.0.1",50004));
-//        nodeList.add(new Node("127.0.0.1",50005));
-//        nodeList.add(new Node("127.0.0.1",50006));
-//        nodeList.add(new Node("127.0.0.1",50007));
-//        nodeList.add(new Node("127.0.0.1",50008));
-//        nodeList.add(new Node("127.0.0.1",50009));
+        nodeList.add(new Node("127.0.0.1",50000));
+        nodeList.add(new Node("127.0.0.1",50001));
+        nodeList.add(new Node("127.0.0.1",50002));
+        nodeList.add(new Node("127.0.0.1",50003));
+        nodeList.add(new Node("127.0.0.1",50004));
+        nodeList.add(new Node("127.0.0.1",50005));
+        nodeList.add(new Node("127.0.0.1",50006));
+        nodeList.add(new Node("127.0.0.1",50007));
+        nodeList.add(new Node("127.0.0.1",50008));
+        nodeList.add(new Node("127.0.0.1",50009));
 
         List<Integer> node_degree = new ArrayList<>();
 
@@ -102,11 +102,16 @@ public class QueryHandler {
                 System.out.println("3.Select node to send query: Default value 0");
                 System.out.println("4.Get stat after 50 queries");
                 System.out.println("5.Final Stat Results after 250 queries");
-                System.out.println("6.Exit");
+                System.out.println("6.Remove node from");
+                System.out.println("7.Exit");
                 System.out.println("CURRENT QUERY POSITION: "+ query_position);
                 Scanner scan = new Scanner(System.in);
-                option = scan.nextInt();
                 int len = nodeList.size();
+                try {
+                    option = Integer.parseInt(scan.nextLine().trim());
+                }catch (NumberFormatException e){
+                    option=-1;
+                }
                 switch (option){
                     case 1:
                         reply = "0010 CLEAR";
@@ -119,15 +124,27 @@ public class QueryHandler {
                     case 9:
                         String query_search = queryList.get(query_position);
                         query_position++;
-                        reply = "0000 QUERY "+ query_search.trim().replace(" ", "_");
-                        DatagramPacket dpReply = new DatagramPacket(reply.getBytes(), reply.getBytes().length, InetAddress.getByName(nodeList.get(node_position).getIp()), nodeList.get(node_position).getPort());
-                        socket.send(dpReply);
+                        if(query_position<queryList.size()) {
+                            reply = "0000 QUERY " + query_search.trim().replace(" ", "_");
+                            DatagramPacket dpReply = new DatagramPacket(reply.getBytes(), reply.getBytes().length, InetAddress.getByName(nodeList.get(node_position).getIp()), nodeList.get(node_position).getPort());
+                            socket.send(dpReply);
+                        }else{
+                            System.out.println("reached to the limit");
+                        }
                         break;
                     case 3:
                         System.out.println("Current Node " + node_position);
                         System.out.println("Enter new node position");
                         Scanner scanner = new Scanner(System.in);
-                        node_position = scanner.nextInt();
+                        try {
+                            node_position = Integer.parseInt(scan.nextLine().trim());
+                            if(node_position>nodeList.size()){
+                                System.out.println("node is not exist");
+                            }
+                        }catch (NumberFormatException e){
+                            System.out.println("Invalid input for node position");
+                        }
+
                         query_position=0;
                         System.out.println("Current node updated: "+ node_position);
                         break;
@@ -214,7 +231,7 @@ public class QueryHandler {
                         fileNumber++;
 
                         FileWriter fw = new FileWriter(file);
-                        fw.write("recieved,answered,sent,node degree,latency,hops");
+                        fw.write("recieved,answered,sent,node degree,latency,hops\n");
                         fw.write(min_rec+","+min_ans+","+min_sent+","+min_ndgree+","+latency_min+","+hop_min+"\n");
                         fw.write(max_rec+","+max_ans+","+max_sent+","+max_ndgree+","+latency_max+","+hop_max+"\n");
                         fw.write(avg_rec+","+avg_ans+","+avg_sent+","+avg_ndgree+","+latency_average+","+hop_average+"\n");
@@ -223,6 +240,23 @@ public class QueryHandler {
                         fw.close();
                         break;
                     case 6:
+                        System.out.println("Enter leaving node position");
+                        int leaving =0;
+                        try {
+                            leaving = Integer.parseInt(scan.nextLine().trim());
+                        }catch (NumberFormatException e){
+                            leaving=-1;
+                        }
+                        try{
+                            System.out.println("removed node"+nodeList.remove(leaving));
+                            System.out.println("Successfullly removed node "+ leaving);
+                        }catch (Exception e){
+                            System.out.println("Error in removing node");
+                        }
+                        System.out.println(nodeList);
+                        break;
+                    case 7:
+                        System.exit(0);
                         break;
                     default:
                         System.out.println("Invalid input");
