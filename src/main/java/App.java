@@ -16,6 +16,8 @@ public class App {
     private int receivedMessages, sentMessages, unAnsweredMessages;
     private List<Integer> latencyArray = new ArrayList<>();
     private List<Integer> hopArray = new ArrayList<>();
+
+    //following variables are needed for automatiob process
     private int localResultCounter=0;
     private String localQuerry="";
     private List<String> LocalQueries=new ArrayList<>();
@@ -143,16 +145,17 @@ public class App {
                 latencyArray.add((int) latency);
                 hopArray.add(result.getHops());
 
-            System.out.println("\nq= " +queryPointer+" **Result : "+ ++localResultCounter +"  [ Query = "+localQuerry+"]" );
+            System.out.println(" **Result : "+ ++localResultCounter +"  [ Query = "+localQuerry+"]" );
             String output = String.format("Number of movies: %d\nMovies: %s\nHops: %d\nSender %s:%d\nLatency: %s ms",
                     moviesCount, result.getMovies().toString(), result.getHops(), result.getOwner().getIp(), result.getOwner().getPort(), latency);
             echo(output);
 
-            if(localResultCounter==noOfNodesInTheNetwork&&LocalQueries.size()>queryPointer){
+            //Following code is for query automation:
+            /*if(localResultCounter==noOfNodesInTheNetwork&&LocalQueries.size()>queryPointer){
                 startQurey(LocalQueries.get(queryPointer++));
             }else if(LocalQueries.size()<=queryPointer){
                 System.out.println("****Searching completed!****");
-            }
+            }*/
 
         } else if (Command.ERROR.equals(command)) {
             System.out.println("Error");

@@ -45,13 +45,17 @@ public class MovieHandler {
 
     public List<String> searchMoviesList(String query){
         List<String> list = new ArrayList<String>();
+        String temp = null;
+        String tempQuery = null;
 
+        tempQuery = "_" + query.toLowerCase().replaceAll(" ", "_")+"_";
         if (query != null && !query.trim().equals("")) {
-            query = query.toLowerCase();
+
             for (String movie : movies) {
-                if (movie.toLowerCase().contains(query)) {
+                temp = "_"+movie.toLowerCase().replaceAll(" ","_")+"_";
+                if (temp.contains(tempQuery)) {
                     // Remove the spaces
-                    list.add(movie.replaceAll(" ", "_"));
+                    list.add(movie.replaceAll(" ","_"));
                 }
             }
         }
